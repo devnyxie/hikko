@@ -1,0 +1,11 @@
+pages:
+  - name: Home
+    path:
+    components:
+      - navbar
+      - component2
+  - name: About
+    path: about
+    components:
+      - component2
+      - component1

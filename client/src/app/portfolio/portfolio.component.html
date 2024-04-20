@@ -1,0 +1,36 @@
+<div>
+  <h4 class="underlined-heading">Open Source Contributions</h4>
+  <ul>
+    <li class="item" *ngFor="let contribution of contributions">
+      <p>{{ contribution.name }}</p>
+      <p class="description">{{ contribution.description }}</p>
+      <div class="languages-container">
+        <div
+          class="language ubuntu-mono-regular"
+          *ngFor="let language of contribution.languages"
+        >
+          <div class="chip" [ngClass]="language.toLowerCase()"></div>
+          {{ language }}
+        </div>
+      </div>
+    </li>
+  </ul>
+  <div>
+    <h4 class="underlined-heading">Projects</h4>
+    <ul>
+      <li class="item" *ngFor="let project of projects">
+        <a [href]="project.url">{{ project.name }}</a>
+        <p class="description">{{ project.description }}</p>
+        <div class="languages-container">
+          <div
+            class="language ubuntu-mono-regular"
+            *ngFor="let language of project.languages"
+          >
+            <div class="chip" [ngClass]="language.toLowerCase()"></div>
+            {{ language }}
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+.item .description {
+  font-size: 13px;
+}
+
+.languages-container {
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.language {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  font-size: 12px;
+}
+
+.chip {
+  display: inline-block;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  border: 1px solid #323330;
+  margin-right: 3px;
+}
+
+/*Languages*/
+.go {
+  background-color: #00add8;
+  color: #ffffff;
+}
+.typescript {
+  background-color: #3178c6;
+  color: #ffffff;
+}
+.javascript {
+  background-color: #f1e05a;
+  color: #323330;
+}
+
+.python {
+  background-color: #3572a5;
+  color: #ffffff;
+}

@@ -61,7 +61,7 @@
           "builder": "@angular-builders/custom-esbuild:dev-server",
           "options": {
             "buildTarget": "dynamic-routes:build",
-            "middlewares": ["./esbuild/middleware.js"]
+            "poll": 500
           },
           "configurations": {
             "production": {

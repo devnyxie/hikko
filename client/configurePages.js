@@ -20,15 +20,28 @@ function checkIfPagesComponentsExist() {
       return false;
     }
     const pageText = fs.readFileSync(`${pagesDirPath}/${filename}`, "utf8");
-    for (const component of page.components) {
-      if (!pageText.includes(`${capitalizeFirstChar(component)}Component`)) {
-        console.log(
-          "Component declaration was not found, generating:",
-          component
-        );
-        return false;
-      }
-    }
+    console.log("Pages components:", page.components);
+
+    // for (const component of page.components) {
+
+    // //NOTE:
+    // // we must also check if there are more components than needed
+    // // for that we need list of all components available
+
+    // if (!pageText.includes(`${capitalizeFirstChar(component)}Component`)) {
+    //   console.log(
+    //     "Component declaration was not found, generating:",
+    //     component
+    //   );
+    //   return false;
+    // } else {
+    //   console.log(
+    //     `${pagesDirPath}/${filename}: `,
+    //     "Component declaration found:",
+    //     component
+    //   );
+    // }
+    // }
   }
   return true;
 }
@@ -39,12 +52,17 @@ function log(...args) {
 
 export function ConfigurePages() {
   try {
-    if (checkIfPagesComponentsExist()) {
-      log("Pages already exist, skipping...");
-      return;
-    }
-    //Create empty pages directory
     const pagesDirPath = "./src/app/pages";
+    // if (checkIfPagesComponentsExist()) {
+    //   log("Pages already exist, skipping...");
+    //   return;
+    // } else {
+    //   if (fs.existsSync(pagesDirPath)) {
+    //     fs.rmSync(pagesDirPath, { recursive: true });
+    //   }
+    // }
+
+    // Clear the directory
     if (fs.existsSync(pagesDirPath)) {
       fs.rmSync(pagesDirPath, { recursive: true });
     }
@@ -63,7 +81,7 @@ export function ConfigurePages() {
         .map((component) => {
           return `import { ${capitalizeFirstChar(
             `${component}Component`
-          )} } from '../${component.toLowerCase()}/${component.toLowerCase()}.component';`;
+          )} } from '../components/${component.toLowerCase()}/${component.toLowerCase()}.component';`;
         })
         .join("\n")}      
   

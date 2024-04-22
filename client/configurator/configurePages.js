@@ -141,13 +141,18 @@ function generateRootComponentsDeclarations(rootComponents) {
   const $ = load(html);
   for (const component of rootComponents) {
     const componentName = getComponentName(component);
-    if (component.options.rootPosition) {
+    if (component.insertInto) {
       const target = component.insertInto ?? ".root";
       if (target) {
         $(`${target}`).append(
           `<app-${componentName.toLowerCase()}></app-${componentName.toLowerCase()}>`
         );
       }
+    } else {
+      // append to the root container by default
+      $(".container").append(
+        `<app-${componentName.toLowerCase()}></app-${componentName.toLowerCase()}>`
+      );
     }
   }
   fs.writeFileSync(`./src/app/app.component.html`, $.html());
@@ -167,11 +172,11 @@ function generateRouter(pages) {
     )
     .join("\n")}
 
-  export const appRoutes: Routes = [
+  export const routes: Routes = [
     ${routes}
   ];
   `;
-  fs.writeFileSync(`./src/app/app.router.ts`, content);
+  fs.writeFileSync(`./src/app/app.routes.ts`, content);
 }
 
 function setComponentsDefaultOptions(pages) {
@@ -204,7 +209,7 @@ export function ConfigurePages() {
     generatePagesWithComponents(pagesConfig.pages);
     // Generate root components declarations
     generateRootComponentsDeclarations(pagesConfig.rootComponents);
-    // Generate the router (app.router.ts)
+    // Generate the router (app.routes.ts)
     generateRouter(pagesConfig.pages);
   } catch (error) {
     //break app

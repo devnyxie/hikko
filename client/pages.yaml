@@ -9,7 +9,7 @@ rootComponents: # Components that are inserted into the root of the page (e.g. n
         portfolio: "/portfolio"
 pages:
   - name: Home
-    path: "/"
+    path: ""
     components:
       - profile
       - portfolio

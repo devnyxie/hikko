@@ -1,4 +1,4 @@
-import { parse, stringify } from "yaml";
+import { parse } from "yaml";
 import fs from "fs";
 import { load } from "cheerio";
 import fse from "fs-extra";
@@ -8,6 +8,10 @@ const pagesConfig = parse(fs.readFileSync("./pages.yaml", "utf8"));
 
 function capitalizeFirstChar(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function log(...args) {
+  console.log(`[configure-pages-process]`, ...args);
 }
 
 function getComponentName(component) {
@@ -191,10 +195,6 @@ function setComponentsDefaultOptions(pages) {
     }
   }
   return components;
-}
-
-function log(...args) {
-  console.log(`[configure-pages-process]`, ...args);
 }
 
 export function ConfigurePages() {

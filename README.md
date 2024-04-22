@@ -16,14 +16,28 @@ By utilizing a single config file to specify pages and components, our Angular c
 
 #### Client
 
-Clone the repository:
+1. Clone the repository:
 
-1. git clone git@github.com:devnyxie/hikko.git
-   Navigate to the client directory:
-2. cd hikko/client
-   Install dependencies:
-3. npm install
-   Start the development server:
-4. npm run dev
+```bash
+git clone git@github.com:devnyxie/hikko.git
+```
+
+2. Navigate to the client directory:
+
+```bash
+cd hikko/client
+```
+
+3. Install dependencies:
+
+```bash
+npm install
+```
+
+4. Start the development server:
+
+```bash
+npm run dev
+```
 
 Note: While you can still use `ng serve`, it is recommended to use `npm run dev` as it triggers the config setup script for a smoother development experience.

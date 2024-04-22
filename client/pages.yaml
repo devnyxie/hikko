@@ -1,10 +1,19 @@
+rootComponents: # Components that are inserted into the root of the page (e.g. navbar, footer)
+  - navbar:
+    insertInto: ".root-top" # Accepts only a CSS Selector
+    options: # Component related options
+      enableSiteTitle: true
+      siteTitleValue: "Hikko"
+      links:
+        about: "/about"
+        portfolio: "/portfolio"
 pages:
   - name: Home
-    path:
+    path: "/"
     components:
-      - navbar
-  - name: About
+      - profile
+      - portfolio
+  - name: about
     path: about
     components:
-      - navbar
-      - portfolio
+      - profile

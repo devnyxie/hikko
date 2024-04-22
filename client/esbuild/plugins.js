@@ -1,4 +1,4 @@
-import { ConfigurePages } from "../configurePages.js";
+import { ConfigurePages } from "../configurator/configurePages.js";
 
 const initConfiguration = {
   name: "init-configuration",

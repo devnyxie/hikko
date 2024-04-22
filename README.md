@@ -12,3 +12,18 @@ With the help of [@angular-builders/custom-esbuild](https://github.com/just-jeb/
 
 By utilizing a single config file to specify pages and components, our Angular client generates custom router and pages with selected component declarations. Additionally, it's in the roadmap that a single Theme will be able to override specific HTML parts of the application by simply declaring themed versions of certain components. Thanks to our plugins and middleware, we can search for theme's components and choose which components to use at build time, so this process won't affect performance in any way.
 
+### Local Development
+
+#### Client
+
+Clone the repository:
+
+1. git clone git@github.com:devnyxie/hikko.git
+   Navigate to the client directory:
+2. cd hikko/client
+   Install dependencies:
+3. npm install
+   Start the development server:
+4. npm run dev
+
+Note: While you can still use `ng serve`, it is recommended to use `npm run dev` as it triggers the config setup script for a smoother development experience.

@@ -49,3 +49,10 @@ src/app/app.routes.ts
 
 # Images
 src/assets/images
+
+# app.component.html and app.component.ts (generated)
+src/app/app.component.html
+src/app/app.component.ts
+
+# Components
+src/app/components

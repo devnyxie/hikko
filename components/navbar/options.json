@@ -4,5 +4,6 @@
   "links": {
     "about": "/about",
     "portfolio": "/portfolio"
-  }
+  },
+  "insertInto": "root"
 }

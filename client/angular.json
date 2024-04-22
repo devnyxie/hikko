@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "dynamic-routes": {
+    "hikko": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -19,17 +19,12 @@
             "ssr": {
               "entry": "server.ts"
             },
-            "outputPath": "dist/dynamic-routes",
+            "outputPath": "dist/hikko",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/config.yaml",
-              "src/pages.yaml"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.css"],
             "scripts": []
           },
@@ -60,15 +55,15 @@
         "serve": {
           "builder": "@angular-builders/custom-esbuild:dev-server",
           "options": {
-            "buildTarget": "dynamic-routes:build",
+            "buildTarget": "hikko:build",
             "poll": 500
           },
           "configurations": {
             "production": {
-              "buildTarget": "dynamic-routes:build:production"
+              "buildTarget": "hikko:build:production"
             },
             "development": {
-              "buildTarget": "dynamic-routes:build:development"
+              "buildTarget": "hikko:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -76,7 +71,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "dynamic-routes:build"
+            "buildTarget": "hikko:build"
           }
         },
         "test": {

@@ -1,0 +1,16 @@
+# This is the theme's info example file.
+# Without this file the theme will not be loaded!
+
+CSSInJS: theme.js # CSS in JS theme file. Commonly used for easy dark mode implementation and less CSS.
+styles: theme.css
+refactoredComponents: # Components that were modified or have different options to suit or work with the theme.
+  - name: blog
+    # --- refactoring ---
+    # If folder & main file are specified, themed customized component will be used instead of the core component. Do not specify if you want to use original components.
+    folder: ./blog #  each component must have their own folder.
+    main: "./blog/Blog.tsx" # each component must have their own main file, linking to all the other files. Default import will be used.
+    # --- options ---
+    options: # Theme's component related options ()
+      maxPostsPerPage: 5
+      showExcerpt: true
+      showDate: true

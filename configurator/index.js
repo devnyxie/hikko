@@ -1,139 +1,94 @@
 import { parse } from "yaml";
 import fs from "fs";
 import fse from "fs-extra";
-import { log, getComponentName, capitalizeFirstChar } from "./utils.js";
+import { log, welcomeMessage } from "./utils.js";
+import initLayout from "./initLayout.js";
+import initPages from "./initPages.js";
 
+export const CONFIG_PATH = "./config.yaml";
+export const APP_PATH = "./app";
+
+// config format example
 /*
---- Configurator ---
-
-
-1: parse config file (config.yaml)
-1.5: create layout with all rootComponents
-2: create folders with page.tsx for each page in the config file, if its root page, create just a file without folder.
-    2.1: for each component, copy it from the /components folder to the app/components folder.
-    2.2: each page.tsx must:
-        2.2.1: render the components specified in the config file, importing them from the app/components folder.
-        2.2.2: pass the props specified in the config file to the components.
-
-we can re-create whole app folder on-changem, but we can also just re-create the (components,pages).
-
---- App ---
-1: run the app (next dev)
+site_title: "My Site"
+site_description: "This is my site"
+pages:
+  - name: Home
+    path: ""
+    components:
+      - profile
+      - portfolio:
+        options:
+          title: "My Portfolio"
+          items:
+            - title: "Project One"
+              description: "This is a project"
+              image: "https://via.placeholder.com/150"
+  - name: about
+    path: about
+    components:
+      - profile
+rootComponents: # Components that are inserted into the layout of the page (e.g. navbar, footer)
+  - navbar:
+    placement: "top" # Inserts the component before or after the page content. Options: top/bottom.
+    options: # Component related options
+      siteTitleValue: "Hikko"
+      links:
+        about: "/about"
+        portfolio: "/portfolio"
 */
-
-const CONFIG_PATH = "./config.yaml";
-const COMPONENTS_PATH = "./common/components";
-const STYLES_PATH = "./common/styles";
-const FAVICONS_PATH = "./common/favicons";
-const UTILS_PATH = "./common/utils";
-const TYPES_PATH = "./common/types";
-const APP_PATH = "./app";
-
-// parse config file (config.yaml)
-const config = parse(fs.readFileSync(CONFIG_PATH, "utf8"));
 
 //create initial structure of the app
 function createAppFolder() {
-  log("[createAppFolder]: creating app folder");
+  // Setting the process name for better debugging.
+  process.title = createAppFolder.name;
+  log("creating app folder at " + APP_PATH);
   fse.emptyDirSync(APP_PATH);
-  fse.copySync(COMPONENTS_PATH, `${APP_PATH}/components`);
-  fse.copySync(STYLES_PATH, `${APP_PATH}/styles`);
-  fse.copySync(FAVICONS_PATH, `${APP_PATH}/favicon`);
-  fse.copySync(UTILS_PATH, `${APP_PATH}/utils`);
-  fse.copySync(TYPES_PATH, `${APP_PATH}/types`);
+  // create StoreProvider.tsx file in the app folder for global state management
+  const storeProviderContent = `
+    "use client";
+    import { useRef } from "react";
+    import { makeStore, AppStore } from "../common/redux/store";
+    import { Provider } from "react-redux";
+
+    export default function StoreProvider({
+      children,
+    }: {
+      children: React.ReactNode;
+    }) {
+      const storeRef = useRef<AppStore>();
+      if (!storeRef.current) {
+        // Create the store instance the first time this renders
+        storeRef.current = makeStore();
+      }
+
+      return <Provider store={storeRef.current}>{children}</Provider>;
+    }
+  `;
+  fse.writeFileSync(`${APP_PATH}/StoreProvider.tsx`, storeProviderContent);
 }
 
-function initLayout() {
-  log("[initLayout]: starting layout initialization");
-  let htmlContent = `
-    import type { Metadata } from "next";
-    import { Inter } from "next/font/google";
-    import "./styles/globals.css";
-    import React from "react";
-    /*imports [start]*/
-    ${config.rootComponents
-      .map((component) => {
-        if (!component.placement) {
-          console.error("[initLayout]: component does not have a placement");
-        }
-        const componentName = getComponentName(component);
-        const capitalizedComponentName = capitalizeFirstChar(componentName);
-        return `\nimport ${capitalizedComponentName} from "./components/${componentName}/${capitalizedComponentName}";`;
-      })
-      .join("")}
-    /*imports [end]*/
-    
-    const inter = Inter({ subsets: ["latin"] });
-    
-    export const metadata: Metadata = {
-        title: "${config.site_title}",
-        description: "${config.site_description}",
-        icons: {
-          icon: "./favicon/favicon.svg",
-        },
-    };
-    
-    export default async function RootLayout({
-        children,
-    }: Readonly<{
-        children: React.ReactNode;
-    }>) {
-        return (
-        <html lang="en">
-            <body className={inter.className}>
-            <div>
-              {/*placement: top [start]*/}
-              ${config.rootComponents
-                .map((component) => {
-                  if (component.placement === "top") {
-                    if (!component.placement) {
-                      console.error(
-                        "[initLayout]: component does not have a placement"
-                      );
-                    }
-                    const componentName = getComponentName(component);
-                    const capitalizedComponentName =
-                      capitalizeFirstChar(componentName);
-                    return `\n<${capitalizedComponentName}/>`;
-                  }
-                })
-                .join("")}
-              {/*placement: top [end]*/}
-            </div>
-            <main>{children}</main>
-            <div>
-              {/* placement: bottom [start] */}
-              ${config.rootComponents
-                .map((component) => {
-                  if (component.placement === "bottom") {
-                    if (!component.placement) {
-                      console.error(
-                        "[initLayout]: component does not have a placement"
-                      );
-                    }
-                    const componentName = getComponentName(component);
-                    const capitalizedComponentName =
-                      capitalizeFirstChar(componentName);
-                    return `\n<${capitalizedComponentName}/>`;
-                  }
-                })
-                .join("")}
-              {/* placement: bottom [end] */}
-            </div>
-            </body>
-        </html>
-        );
-    }
-    `;
-  fs.writeFileSync(`./app/layout.tsx`, htmlContent);
-  log("[initLayout]: finished layout initialization");
+function parseConfig() {
+  // Setting the process name for better debugging.
+  process.title = parseConfig.name;
+  log("parsing config file at " + CONFIG_PATH);
+  const config = fs.readFileSync(CONFIG_PATH, "utf8");
+  return parse(config);
 }
+
+// task: pass the configs's components options to the components
 
 function main() {
+  // print out welcome message
+  welcomeMessage();
+  // parse the config file
+  const config = parseConfig();
   // create app folder with all the necessary files
   createAppFolder();
   // create layout with root components (e.g navbar, footer, etc.)
-  initLayout(config.rootComponents);
+  initLayout(config);
+  // create pages with selected components
+  initPages(config.pages);
 }
 
 // run the configurator

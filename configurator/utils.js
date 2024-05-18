@@ -1,5 +1,7 @@
-export function log(...args) {
-  console.log(`[configure-pages-process]: `, ...args);
+import chalk from "chalk";
+
+export function log(str) {
+  console.log(chalk.dim(`[${process.title}]: ${str}`));
 }
 
 export function getComponentName(component) {
@@ -30,4 +32,11 @@ export function insertContentBetweenStrings(
   console.log(`[insertContentBetweenStrings]: added "${content}"`);
 
   return before + `${content}` + `${after}`;
+}
+
+export function welcomeMessage() {
+  const start = `₍ᐢ. .ᐢ₎ ₊˚⊹♡  ✧  `;
+  const message = `Welcome to the configurator!`;
+  const end = ` ✧  ♡⊹˚₊ ₍ᐢ. .ᐢ₎`;
+  console.log(chalk.cyan(start) + chalk.cyan.bold(message) + chalk.cyan(end));
 }

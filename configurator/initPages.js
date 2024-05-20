@@ -25,6 +25,7 @@ export default function initPages(pages) {
       // components options [start]
       ${page.components
         .map((component) => {
+          console.log(component);
           if (component.options) {
             const componentName = component.componentName;
             return `\nconst ${componentName}_options = ${JSON.stringify(

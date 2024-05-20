@@ -11,7 +11,7 @@ components: # Components that were modified or have different options to suit or
     # If "stylesModulePath" is specified, core component will be used with the specified CSS file.
     # (relative to the theme folder)
 
-    # modifiedComponentPath: "./blog/Blog" 
+    modifiedComponentPath: "./blog/Blog" 
       # 0. It must be a valid .tsx Next.js component.
       # 1. If specified, modified component will be used instead of the core component. Do not specify if you want to use original components.
       # 2. If specified, all core components options won't be available in the modified component.

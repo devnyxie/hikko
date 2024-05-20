@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import fs from "fs";
 import { parse } from "yaml";
+import path from "path";
 
 export function log(...args) {
   console.log(chalk.dim(`[${process.title}]:`, ...args));
@@ -88,7 +89,12 @@ export function selectCompToInsert({
             themedComponent.modifiedComponentPath
           );
         }
-        return themedComponent;
+        console.log(
+          "changing " +
+            coreComponentName +
+            " options to modifiedComponentOptions"
+        );
+        modifiedComponent.options = themedComponent.modifiedComponentOptions;
       } else {
         // appending themed components options to core component
         const { modifiedComponentOptions, modifiedComponentPath, ...rest } =
@@ -98,7 +104,7 @@ export function selectCompToInsert({
             `Using core component "${coreComponentName}" with Theme's options`
           )
         );
-        return {
+        modifiedComponent = {
           ...modifiedComponent,
           ...rest,
         };
@@ -107,6 +113,7 @@ export function selectCompToInsert({
 
     return modifiedComponent;
   } catch (error) {
+    console.error(error);
     log(
       chalk.red(
         "Error while choosing component to insert, using core component"

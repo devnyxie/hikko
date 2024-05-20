@@ -15,18 +15,9 @@ export default function initPages(pages) {
     ${page.components
       .map((component) => {
         const componentName = component.componentName;
-        if (isPageRoot) {
-          return `\nimport ${capitalizeFirstChar(
-            componentName
-          )} from "../common/components/${componentName}/${capitalizeFirstChar(
-            componentName
-          )}";`;
-        }
-        return `\nimport ${capitalizeFirstChar(
-          componentName
-        )} from "../../common/components/${componentName}/${capitalizeFirstChar(
-          componentName
-        )}";`;
+        return `\nimport ${capitalizeFirstChar(componentName)} from "${
+          component.path
+        }";`;
       })
       .join("")}
     // imports end

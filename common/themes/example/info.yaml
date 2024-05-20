@@ -1,16 +1,28 @@
 # This is the theme's info example file.
-# Without this file the theme will not be loaded!
 
-CSSInJS: theme.js # CSS in JS theme file. Commonly used for easy dark mode implementation and less CSS.
-styles: theme.css
-refactoredComponents: # Components that were modified or have different options to suit or work with the theme.
-  - name: blog
-    # --- refactoring ---
-    # If folder & main file are specified, themed customized component will be used instead of the core component. Do not specify if you want to use original components.
-    folder: ./blog #  each component must have their own folder.
-    main: "./blog/Blog.tsx" # each component must have their own main file, linking to all the other files. Default import will be used.
-    # --- options ---
-    options: # Theme's component related options ()
+# !!! Without this file the theme will not be loaded !!!
+
+styles: [theme.css] # CSS files that will be loaded in the layout of the page.
+# *CSS-in-JS support will be added in the future.
+components: # Components that were modified or have different options to suit or work with the theme.
+  - componentName: blog
+  
+    stylesModulePath: "./blog/Blog.module.css"
+    # If "stylesModulePath" is specified, core component will be used with the specified CSS file.
+    # (relative to the theme folder)
+
+    # modifiedComponentPath: "./blog/Blog" 
+      # 0. It must be a valid .tsx Next.js component.
+      # 1. If specified, modified component will be used instead of the core component. Do not specify if you want to use original components.
+      # 2. If specified, all core components options won't be available in the modified component.
+      # 3. (relative to the theme folder)
+
+    # Options that will be passed to the themed component.
+    modifiedComponentOptions:
       maxPostsPerPage: 5
       showExcerpt: true
       showDate: true
+
+    # If "options" is specified, core component will be used with the specified options.
+    options:
+      title: "My Blog <3"

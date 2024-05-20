@@ -1,42 +1,12 @@
-import { parse } from "yaml";
-import fs from "fs";
 import fse from "fs-extra";
-import { log, welcomeMessage } from "./utils.js";
+import { log, parseYAML, welcomeMessage } from "./utils.js";
 import initLayout from "./initLayout.js";
 import initPages from "./initPages.js";
+import { initTheme } from "./initTheme.js";
 
-export const CONFIG_PATH = "./config.yaml";
 export const APP_PATH = "./app";
 
-// config format example
-/*
-site_title: "My Site"
-site_description: "This is my site"
-pages:
-  - name: Home
-    path: ""
-    components:
-      - profile
-      - portfolio:
-        options:
-          title: "My Portfolio"
-          items:
-            - title: "Project One"
-              description: "This is a project"
-              image: "https://via.placeholder.com/150"
-  - name: about
-    path: about
-    components:
-      - profile
-rootComponents: # Components that are inserted into the layout of the page (e.g. navbar, footer)
-  - navbar:
-    placement: "top" # Inserts the component before or after the page content. Options: top/bottom.
-    options: # Component related options
-      siteTitleValue: "Hikko"
-      links:
-        about: "/about"
-        portfolio: "/portfolio"
-*/
+const CONFIG_PATH = "./config.yaml";
 
 //create initial structure of the app
 function createAppFolder() {
@@ -68,21 +38,18 @@ function createAppFolder() {
   fse.writeFileSync(`${APP_PATH}/StoreProvider.tsx`, storeProviderContent);
 }
 
-function parseConfig() {
-  // Setting the process name for better debugging.
-  process.title = parseConfig.name;
-  log("parsing config file at " + CONFIG_PATH);
-  const config = fs.readFileSync(CONFIG_PATH, "utf8");
-  return parse(config);
-}
-
 // task: pass the configs's components options to the components
 
 function main() {
+  // ---
+  let config = {};
+  // ---
   // print out welcome message
   welcomeMessage();
   // parse the config file
-  const config = parseConfig();
+  config = parseYAML(CONFIG_PATH);
+  // theme implementation
+  config = initTheme(config);
   // create app folder with all the necessary files
   createAppFolder();
   // create layout with root components (e.g navbar, footer, etc.)

@@ -1,13 +1,14 @@
 import { capitalizeFirstChar, log } from "./utils.js";
 import fs from "fs";
 
-export default function initLayout(config) {
+export default function initLayout(config, theme) {
   // Setting the process name for better debugging.
   process.title = initLayout.name;
   log("starting layout initialization");
   let htmlContent = "";
   if (!config.rootComponents) {
     log("rootComponents not found in config");
+    // CLEAN LAYOUT
     htmlContent = `
     import type { Metadata } from "next";
     import { Inter } from "next/font/google";
@@ -55,6 +56,7 @@ export default function initLayout(config) {
     
     `;
   } else {
+    // MODIFIED LAYOUT
     htmlContent = `
     import type { Metadata } from "next";
     import { Inter } from "next/font/google";
@@ -71,7 +73,7 @@ export default function initLayout(config) {
           }
           const componentName = component.componentName;
           const capitalizedComponentName = capitalizeFirstChar(componentName);
-          return `\nimport ${capitalizedComponentName} from "../common/components/${componentName}/${capitalizedComponentName}";`;
+          return `\nimport ${capitalizedComponentName} from "${component.path}";`;
         })
         .join("")
     }

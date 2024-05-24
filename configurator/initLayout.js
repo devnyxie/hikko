@@ -12,7 +12,7 @@ export default function initLayout(config, theme) {
     htmlContent = `
     import type { Metadata } from "next";
     import { Inter } from "next/font/google";
-    import "../common/styles/globals.css";
+    import "./styles/globals.css";
     import React from "react";
     import StoreProvider from "./StoreProvider";
     /*imports [start]*/
@@ -60,7 +60,7 @@ export default function initLayout(config, theme) {
     htmlContent = `
     import type { Metadata } from "next";
     import { Inter } from "next/font/google";
-    import "../common/styles/globals.css";
+    import "./styles/globals.css";
     import React from "react";
     import StoreProvider from "./StoreProvider";
     /*imports [start]*/

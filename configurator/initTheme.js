@@ -1,14 +1,8 @@
 // # Themes Implementation
 
 import chalk from "chalk";
-import {
-  log,
-  parseYAML,
-  capitalizeFirstChar,
-  ensureRelativePath,
-} from "./utils.js";
+import { log, capitalizeFirstChar, ensureRelativePath } from "./utils.js";
 import path from "path";
-import { APP_PATH } from "./index.js";
 
 function configureComponent({
   component,

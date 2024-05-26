@@ -58,6 +58,7 @@ export function parseYAML(path) {
 
 export function extractCSSModuleName(path) {
   try {
+    log(`Extracting CSS module name from ${path}`);
     const data = fs.readFileSync(path, { encoding: "utf8" });
     const regex = /["'][^"']*\/([^"']*\.module\.css)["']/;
     const match = data.match(regex);

@@ -22,7 +22,7 @@ function main() {
   // theme implementation
   config = initTheme(config, theme);
   // create layout with root components (e.g navbar, footer, etc.)
-  initLayout(config);
+  initLayout(config, theme);
   // create pages with selected components
   initPages(config.pages);
 }

@@ -156,12 +156,14 @@ function configureComponent({ component, config, theme }) {
     }
     if (themedComponent.modifiedStyles) {
       // core CSS Module name
-      const cssModulePath = path.resolve(
+      const cssModulePath = path.join(
         `${COMPONENTS_PATH}`,
         `${componentName}`,
         `${capitalizeFirstChar(componentName)}.tsx`
       );
       const coreCSSModuleName = extractCSSModuleName(cssModulePath);
+      console.log("coreCSSModuleName", cssModulePath, coreCSSModuleName);
+
       if (!coreCSSModuleName) {
         log(
           chalk.red(
@@ -222,7 +224,8 @@ function getTheme(themeName) {
   return theme;
 }
 
-export function initApp(config, theme) {
+export function initApp(config) {
+  let theme = null;
   // Setting the process name for better debugging.
   process.title = initApp.name;
   log("creating app folder at " + APP_PATH);
@@ -231,6 +234,7 @@ export function initApp(config, theme) {
   if (config.theme) {
     log(`copying theme dir "${config.theme}" to ${APP_THEME_PATH}`);
     fse.copySync(path.resolve(THEMES_PATH, config.theme), APP_THEME_PATH);
+    theme = getTheme(config.theme);
   }
   // copy all the necessary components to the app folder
   copyRequiredComponents(config, theme);
@@ -244,5 +248,5 @@ export function initApp(config, theme) {
   fse.copySync(REDUX_PATH, APP_REDUX_PATH);
   // create StoreProvider.tsx file
   initReduxStoreProvider();
-  return getTheme(config.theme);
+  return theme;
 }

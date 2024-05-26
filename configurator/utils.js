@@ -11,6 +11,15 @@ export function capitalizeFirstChar(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+export function ensureRelativePath(str) {
+  // Check if the string starts with "./", "../", or "/"
+  if (/^(\.\/|\.\.\/|\/)/.test(str)) {
+    return str;
+  }
+  // If not, prepend "./"
+  return `./${str}`;
+}
+
 export function insertContentBetweenStrings(
   input,
   startString,
@@ -47,79 +56,14 @@ export function parseYAML(path) {
   return parse(config);
 }
 
-export function selectCompToInsert({
-  component,
-  themedComponents,
-  themeName,
-  isRoot,
-}) {
-  process.title = selectCompToInsert.name;
-  let modifiedComponent = component;
-  const coreComponentName = component.componentName;
-  // core component path
-  if (isRoot) {
-    modifiedComponent.path = `../common/components/${coreComponentName}/${capitalizeFirstChar(
-      coreComponentName
-    )}`;
-  } else {
-    modifiedComponent.path = `../../common/components/${coreComponentName}/${capitalizeFirstChar(
-      coreComponentName
-    )}`;
-  }
-  // end
+export function extractCSSModuleName(path) {
   try {
-    if (!themeName) {
-      log(chalk.red("Theme path is not provided!"));
-      throw new Error(`Theme path is not provided!`);
-    }
-    const themedComponent = themedComponents.find(
-      (themedComp) => themedComp.componentName === coreComponentName
-    );
-    if (themedComponent) {
-      // if the component is modified, return the modified component.
-      if (themedComponent.modifiedComponentPath) {
-        if (isRoot) {
-          modifiedComponent.path = path.join(
-            `../common/themes/${themeName}/`,
-            themedComponent.modifiedComponentPath
-          );
-        } else {
-          modifiedComponent.path = path.join(
-            `../../common/themes/${themeName}/`,
-            themedComponent.modifiedComponentPath
-          );
-        }
-        console.log(
-          "changing " +
-            coreComponentName +
-            " options to modifiedComponentOptions"
-        );
-        modifiedComponent.options = themedComponent.modifiedComponentOptions;
-      } else {
-        // appending themed components options to core component
-        const { modifiedComponentOptions, modifiedComponentPath, ...rest } =
-          themedComponent;
-        log(
-          chalk.green(
-            `Using core component "${coreComponentName}" with Theme's options`
-          )
-        );
-        modifiedComponent = {
-          ...modifiedComponent,
-          ...rest,
-        };
-      }
-    }
-
-    return modifiedComponent;
+    log(`Extracting CSS module name from ${path}`);
+    const data = fs.readFileSync(path, { encoding: "utf8" });
+    const regex = /["'][^"']*\/([^"']*\.module\.css)["']/;
+    const match = data.match(regex);
+    return match[1];
   } catch (error) {
-    console.error(error);
-    log(
-      chalk.red(
-        "Error while choosing component to insert, using core component"
-      )
-    );
-    // console.error(error);
-    return modifiedComponent;
+    return null;
   }
 }

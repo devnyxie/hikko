@@ -2,27 +2,12 @@
 
 # !!! Without this file the theme will not be loaded !!!
 
-styles: [theme.css] # CSS files that will be loaded in the layout of the page.
+styles: # CSS files that will be loaded in the layout of the page.
+  - ./theme.css 
 # *CSS-in-JS support will be added in the future.
 components: # Components that were modified or have different options to suit or work with the theme.
   - componentName: blog
-  
-    stylesModulePath: "./blog/Blog.module.css"
-    # If "stylesModulePath" is specified, core component will be used with the specified CSS file.
-    # (relative to the theme folder)
-
-    modifiedComponentPath: "./blog/Blog" 
-      # 0. It must be a valid .tsx Next.js component.
-      # 1. If specified, modified component will be used instead of the core component. Do not specify if you want to use original components.
-      # 2. If specified, all core components options won't be available in the modified component.
-      # 3. (relative to the theme folder)
-
-    # Options that will be passed to the themed component.
-    modifiedComponentOptions:
-      maxPostsPerPage: 5
-      showExcerpt: true
-      showDate: true
-
-    # If "options" is specified, core component will be used with the specified options.
+    modifiedStyles: "./blog/Blog.module.css" # If specified, core styles will be replaced with theme's "./blog/Blog.module.css" file. Works only if the component has a CSS module file already.
+    modifiedComponentDir: "./blog" # If specified, entire core dir will be replaced with theme's "./blog" dir. App will consider file "Blog.tsx" as the main file of the component.
     options:
       title: "My Blog <3"

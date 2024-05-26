@@ -1,5 +1,6 @@
 import { capitalizeFirstChar, log } from "./utils.js";
 import fs from "fs";
+import path from "path";
 
 export default function initLayout(config, theme) {
   // Setting the process name for better debugging.
@@ -12,12 +13,20 @@ export default function initLayout(config, theme) {
     htmlContent = `
     import type { Metadata } from "next";
     import { Inter } from "next/font/google";
-    import "../common/styles/globals.css";
+    import "./styles/globals.css";
     import React from "react";
     import StoreProvider from "./StoreProvider";
     /*imports [start]*/
+    // STYLES
+    ${
+      theme.styles &&
+      (Array.isArray(theme.styles)
+        ? theme.styles
+            .map((style) => `\nimport "./${path.join("theme/", `${style}`)}";`)
+            .join("\n")
+        : `\nimport "./${path.join("theme/", `${style}`)}";`)
+    }
     /*imports [end]*/
-    
     const inter = Inter({ subsets: ["latin"] });
     
     export const metadata: Metadata = {
@@ -60,10 +69,20 @@ export default function initLayout(config, theme) {
     htmlContent = `
     import type { Metadata } from "next";
     import { Inter } from "next/font/google";
-    import "../common/styles/globals.css";
+    import "./styles/globals.css";
     import React from "react";
     import StoreProvider from "./StoreProvider";
     /*imports [start]*/
+    // STYLES
+    ${
+      theme.styles &&
+      (Array.isArray(theme.styles)
+        ? theme.styles
+            .map((style) => `\nimport "./${path.join("theme/", `${style}`)}";`)
+            .join("\n")
+        : `\nimport "./${path.join("theme/", `${style}`)}";`)
+    }
+    // COMPONENTS
     ${
       config.rootComponents &&
       config.rootComponents

@@ -1,0 +1,5 @@
+node_modules
+.next
+.prettierignore
+config.yaml
+app

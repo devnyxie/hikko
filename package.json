@@ -1,0 +1,30 @@
+{
+  "name": "hikko",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node configurator && next dev & yarn watch:configurator",
+    "watch:configurator": "onchange -v './config.yaml' './common/**/*' './configurator/**/*' -- node configurator",
+    "build": "node configurator && next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.2.5",
+    "chalk": "^5.3.0",
+    "fs-extra": "^11.2.0",
+    "next": "14.2.3",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-redux": "^9.1.2",
+    "yaml": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "onchange": "^7.1.0",
+    "typescript": "^5"
+  }
+}

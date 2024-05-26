@@ -1,9 +1,0 @@
-{
-  "enableSiteTitle": true,
-  "siteTitleValue": "Hikko",
-  "links": {
-    "about": "/about",
-    "portfolio": "/portfolio"
-  },
-  "insertInto": "root"
-}

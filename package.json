@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node configurator && next dev & yarn watch:configurator",
+    "watch:configurator": "onchange -v './config.yaml' './common/**/*' './configurator/**/*' -- node configurator",
+    "build": "node configurator && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -29,6 +30,7 @@
     "@types/react-dom": "^18",
     "next-plugin-yaml": "^1.0.1",
     "typescript": "^5",
-    "yaml-loader": "^0.8.1"
+    "yaml-loader": "^0.8.1",
+    "onchange": "^7.1.0"
   }
 }

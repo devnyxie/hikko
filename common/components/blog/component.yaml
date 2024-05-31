@@ -1,0 +1,16 @@
+
+# !!!
+
+# we have followed the OLD tutorial.
+# new one: https://github.com/vercel/examples/tree/main/solutions/blog
+# notes:
+# [slug] and page.tsx can be in the same folder. I think the configurator may re-write the folder, so let's make sure we can have separate blog component + page.
+
+
+# !!!
+
+pages: # List of pages to be added in the app
+  - src: "./page" # Directory/File where certain page is located. 
+                  # If dir, all TSX files will be checked for mentioned imports and copied to the app.
+    dest: "./post/[slug]" # Destination in the app.
+

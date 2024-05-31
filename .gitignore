@@ -3,3 +3,6 @@ node_modules
 .prettierignore
 config.yaml
 app
+.local
+.env
+posts

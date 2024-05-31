@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import themeSlice from "./features/theme/themeSlice";
+import { createWrapper, Context, HYDRATE } from "next-redux-wrapper";
 
 export const makeStore = () => {
   return configureStore({

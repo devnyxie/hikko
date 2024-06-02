@@ -5,7 +5,8 @@ const nextConfig = {
     if (dev && !isServer) {
       // Custom Webpack's watch options
       config.watchOptions = {
-        aggregateTimeout: 300, // Debounce delay of 300ms
+        aggregateTimeout: 400, // Debounce delay of 300ms
+        poll: 100, // Enable polling mode
       };
     }
     return config;

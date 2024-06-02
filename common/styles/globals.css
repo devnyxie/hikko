@@ -1,5 +1,6 @@
 :root {
-  --max-width: 1100px;
+  --border-radius: 3px;
+  --max-main-width: 1100px;
   --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
@@ -19,13 +20,6 @@ body {
 
 body {
   min-height: 100vh;
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
 }
 
 a {
@@ -33,11 +27,17 @@ a {
   text-decoration: none;
 }
 
-/* Main Container (defined in Layout.tsx) */
-main {
-  max-width: var(--max-width);
+/* Container (defined in Layout.tsx) */
+.container {
+  padding: 1rem;
+  max-width: var(--max-main-width);
   margin: 0 auto;
-  padding: 2rem;
+}
+
+/* Main (defined in Layout.tsx) */
+main {
+  max-width: var(--max-main-width);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;

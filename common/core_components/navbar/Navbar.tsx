@@ -2,6 +2,7 @@
 import React from "react";
 import module from "./Navbar.module.css";
 import ThemeToggler from "../themeToggler/ThemeToggler";
+import BuyMeCoffeeButton from "../buyMeCoffee/BuyMeCoffee";
 
 interface Link {
   title: string | null;
@@ -12,6 +13,8 @@ interface NavbarOptions {
   siteTitle?: string;
   links?: Link[];
   themeToggle?: boolean;
+  buyMeCoffee?: boolean;
+  buyMeCoffeeUrl?: string;
 }
 
 interface NavbarProps {
@@ -33,6 +36,10 @@ const Navbar: React.FC<NavbarProps> = ({ options }) => {
               </a>
             ))}
         </div>
+        {/* If buyMeCoffee option is true and username is present, render it: */}
+        {options.buyMeCoffee && options.buyMeCoffeeUrl && (
+          <BuyMeCoffeeButton options={{ url: options.buyMeCoffeeUrl }} />
+        )}
         {/* If themeToggler option is true, render it: */}
         {options.themeToggle && <ThemeToggler />}
       </div>

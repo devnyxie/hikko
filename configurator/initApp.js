@@ -47,10 +47,78 @@ function initReduxStoreProvider() {
   fse.writeFileSync(`${APP_PATH}/StoreProvider.tsx`, storeProviderContent);
 }
 
-const extractFolderName = (input) => {
-  const regex = /^import\s+.*?from\s+['"]\.\.\/([^\/]+)\/[^\/]+['"]/;
-  const match = input.match(regex);
-  return match ? match[1] : null;
+function alterPageAbsolutePaths(filePath) {
+  const from = "@/common/components";
+  const to = "@/app/components";
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+  }
+  const fileContent = fs.readFileSync(filePath, "utf8");
+  const escapedFrom = escapeRegExp(from);
+  const newContent = fileContent.replace(new RegExp(escapedFrom, "g"), to);
+  fs.writeFileSync(filePath, newContent);
+}
+
+function detectRelativePaths(filePath) {
+  try {
+    const fileContent = fs.readFileSync(filePath, "utf8");
+    const lines = fileContent.split("\n");
+    const relativePaths = [];
+
+    const relativePathRegex = /from "\.\./i;
+
+    lines.forEach((line) => {
+      const match = line.match(relativePathRegex);
+      if (match) {
+        relativePaths.push(line.trim());
+      }
+    });
+
+    return relativePaths;
+  } catch (error) {
+    console.error("Error reading file:", error);
+    return [];
+  }
+}
+
+function alterImports(srcPath, destPath) {
+  const relativePaths = detectRelativePaths(srcPath);
+  console.log(relativePaths);
+  if (relativePaths.length > 0) {
+    console.error(
+      chalk.red(
+        `Relative paths found in ${srcPath}: \n${relativePaths
+          .map(
+            (path, index) =>
+              `${relativePaths.length > 1 ? index + ":" : ""} ${path}`
+          )
+          .join("\n")}`
+      )
+    );
+    process.exit(1);
+  }
+  // if everything is alright, alter absolute paths from "/common/" to "/app/"
+  alterPageAbsolutePaths(destPath);
+}
+
+const extractFolderName = (input, componentName) => {
+  // Regex for relative imports
+  const relativeRegex = /^import\s+.*?from\s+['"]\.\.\/([^\/]+)\/[^\/]+['"]/;
+  // Regex for absolute imports
+  const absoluteRegex =
+    /^import\s+.*?from\s+['"]@\/common\/components\/([^\/]+)\/[^\/]+['"]/;
+
+  let match = input.match(relativeRegex);
+  if (match && match[1] !== componentName) {
+    return match[1];
+  }
+
+  match = input.match(absoluteRegex);
+  if (match && match[1] !== componentName) {
+    return match[1];
+  }
+
+  return null;
 };
 
 function checkForMentionedComponents(filePath, componentName) {
@@ -68,7 +136,7 @@ function checkForMentionedComponents(filePath, componentName) {
     .split("\n")
     .filter((line) => line.startsWith("import"));
   importLines.forEach((line) => {
-    const folderName = extractFolderName(line);
+    const folderName = extractFolderName(line, componentName);
     if (folderName) {
       log(`Found mentioned component "${folderName}" in "${componentName}"`);
       mentionedComponents.push(folderName);
@@ -80,10 +148,8 @@ function checkForMentionedComponents(filePath, componentName) {
 function configureComponent({ component, config, theme }) {
   process.title = configureComponent.name;
   const componentName = component.componentName;
-  // check if such component exists in ./common/components
-  const coreComponentExist = fse.existsSync(
-    `${COMPONENTS_PATH}/${componentName}`
-  );
+  const componentPath = `${COMPONENTS_PATH}/${componentName}`;
+  const coreComponentExist = fse.existsSync(componentPath);
   if (!coreComponentExist) {
     log(
       chalk.red(
@@ -96,10 +162,10 @@ function configureComponent({ component, config, theme }) {
   }
 
   // SRC path
-  let srcComponentPath = path.resolve(COMPONENTS_PATH, `${componentName}`);
+  let srcComponentPath = path.join(COMPONENTS_PATH, `${componentName}`);
 
   // DEST path
-  let destComponentPath = path.resolve(APP_COMPONENTS_PATH, `${componentName}`);
+  let destComponentPath = path.join(APP_COMPONENTS_PATH, `${componentName}`);
 
   // check if component requires other components
   const otherComponents = checkForMentionedComponents(
@@ -119,18 +185,17 @@ function configureComponent({ component, config, theme }) {
   // Setting the process name again after the recursive call
   process.title = configureComponent.name;
 
-  // if the component has altered options/style/structure in the theme
+  // if the component has altered options/structure in the theme
   if (config.theme && theme) {
-    console.log("theme", theme);
     const themedComponent = theme.components.find(
       (themedComp) => themedComp.componentName === componentName
     );
     if (themedComponent) {
+      // if the component has been altered in the theme, copy the entire component's folder
       if (themedComponent.modifiedComponentDir) {
         log(
           `Component ${componentName} has been altered in theme "${config.theme}"`
         );
-        // Replace entire component
         srcComponentPath = path.resolve(
           THEMES_PATH,
           `${config.theme}`,
@@ -142,9 +207,101 @@ function configureComponent({ component, config, theme }) {
       }
     }
   }
+
   // If the component has not been altered in the theme, copy the core component.
   log(`copying core "${componentName}" component to ${APP_COMPONENTS_PATH}`);
   fse.copySync(srcComponentPath, destComponentPath);
+
+  // Check if the component requires the creation of a dedicated page (e.g., blog post page)
+  const componentYAMLPath = path.join(srcComponentPath, "component.yaml");
+  log(`Checking for component.yaml file at ${componentYAMLPath}...`);
+  if (fse.existsSync(componentYAMLPath)) {
+    log(chalk.green(`Found component.yaml file at ${componentYAMLPath}`));
+    const componentYAML = parseYAML(componentYAMLPath);
+    log(`"${componentName}"'s component.yaml successfully parsed`);
+    if (componentYAML.pages) {
+      log(`"${componentName}" requires the creation of dedicated pages`);
+      // Each page is an object of the form { src: string, dest: string }.
+      // Dir must be simply copied from src to dest.
+      componentYAML.pages.forEach((page) => {
+        const src = path.join(srcComponentPath, page.src);
+        const dest = path.join(APP_PATH, page.dest);
+        fse.copySync(src, dest);
+        log(`Dedicated page ${page.src} copied to ${page.dest}`);
+        log("Checking for mentioned components in the dedicated page...");
+        if (!src.endsWith(".tsx")) {
+          const tsxFiles = fs
+            .readdirSync(src)
+            .filter((file) => file.endsWith(".tsx"));
+          log(`Found ${tsxFiles.length} .tsx file(s) in ${src}`);
+          const tsxFilePaths = tsxFiles.map((file) => path.join(src, file));
+          tsxFilePaths.forEach((filePath) => {
+            const otherComponents = checkForMentionedComponents(
+              filePath,
+              componentName
+            );
+            if (otherComponents.length > 0) {
+              otherComponents.forEach((otherComponent) => {
+                configureComponent({
+                  component: { componentName: otherComponent },
+                  config,
+                  theme,
+                });
+              });
+            }
+          });
+        } else {
+          const otherComponents = checkForMentionedComponents(
+            src,
+            componentName
+          );
+          if (otherComponents.length > 0) {
+            otherComponents.forEach((otherComponent) => {
+              configureComponent({
+                component: { componentName: otherComponent },
+                config,
+                theme,
+              });
+            });
+          }
+        }
+        // [dest] Alter absolute paths in the dedicated page(s) from @/common/components to @/app/components.
+        log("Altering absolute paths in the dedicated pages(s)");
+        console.log("dest:", dest);
+        if (!dest.endsWith(".tsx")) {
+          const tsxFiles = fs
+            .readdirSync(dest)
+            .filter((file) => file.endsWith(".tsx"));
+          const tsxFilePaths = tsxFiles.map((file) => path.join(dest, file));
+          tsxFilePaths.forEach((filePath, index) => {
+            log(`Altering absolute paths in ${filePath}`);
+            const filePathDest = filePath;
+            const filePathSrc = path.join(src, tsxFiles[index]);
+            console.log(filePathSrc, filePathDest);
+            alterImports(filePathSrc, filePath);
+            // alterPageAbsolutePaths(
+            //   filePath,
+            //   "@/common/components",
+            //   "@/app/components"
+            // );
+            // updatePageImportPaths(
+            //   path.join(src, tsxFiles[index]),
+            //   path.join(dest, tsxFiles[index])
+            // );
+          });
+        } else {
+          log(`Altering absolute paths in ${dest}`);
+          // alterPageAbsolutePaths(
+          //   dest,
+          //   "@/common/components",
+          //   "@/app/components"
+          // );
+          // updatePageImportPaths(src, dest);
+          alterImports(src, dest);
+        }
+      });
+    }
+  }
 
   // check if there is modifed CSS module, if so, copy it to the component folder
   if (config.theme && theme) {
@@ -162,8 +319,6 @@ function configureComponent({ component, config, theme }) {
         `${capitalizeFirstChar(componentName)}.tsx`
       );
       const coreCSSModuleName = extractCSSModuleName(cssModulePath);
-      console.log("coreCSSModuleName", cssModulePath, coreCSSModuleName);
-
       if (!coreCSSModuleName) {
         log(
           chalk.red(
@@ -192,15 +347,17 @@ function configureComponent({ component, config, theme }) {
 
 function copyRequiredComponents(config, theme) {
   // page's components
-  config.pages.forEach((page) => {
-    page.components.forEach((component) => {
+  config.pages &&
+    config.pages.forEach((page) => {
+      page.components.forEach((component) => {
+        configureComponent({ component, config, theme });
+      });
+    });
+  // root components
+  config.rootComponents &&
+    config.rootComponents.forEach((component) => {
       configureComponent({ component, config, theme });
     });
-  });
-  // root components
-  config.rootComponents.forEach((component) => {
-    configureComponent({ component, config, theme });
-  });
 }
 
 function findTheme(themeName, THEME_PATH, themeInfoFilePath) {

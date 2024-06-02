@@ -8,8 +8,10 @@ const nextConfig = {
         aggregateTimeout: 300, // Debounce delay of 300ms
       };
     }
-
     return config;
+  },
+  compiler: {
+    styledComponents: true,
   },
 };
 

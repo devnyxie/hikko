@@ -84,7 +84,7 @@ export default function initLayout(config, theme) {
     }
     // COMPONENTS
     ${
-      config.rootComponents &&
+      config.rootComponents.length > 0 &&
       config.rootComponents
         .map((component) => {
           if (!component.placement) {

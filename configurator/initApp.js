@@ -4,6 +4,7 @@ import { APP_PATH } from "./index.js";
 import {
   capitalizeFirstChar,
   extractCSSModuleName,
+  extractCSSModulePath,
   log,
   parseYAML,
 } from "./utils.js";
@@ -126,112 +127,145 @@ function chkMentionComp(filePath, componentName) {
 
 // function to configure a component (copy core/modified component to app folder etc.)
 function cfgComp({ component, config, theme }) {
-  // Setting the process name for better debugging.
+  let modifiedComponent = component;
   process.title = cfgComp.name;
-  const componentName = component.componentName;
+  try {
+    // Setting the process name for better debugging.
+    const componentName = component.componentName;
 
-  const coreComponentPath = path.join(CORE_COMPONENTS_PATH, componentName);
-  const coreComponentExist = fse.existsSync(coreComponentPath);
+    const coreComponentPath = path.join(CORE_COMPONENTS_PATH, componentName);
+    const coreComponentExist = fse.existsSync(coreComponentPath);
 
-  if (coreComponentExist) {
-    log(`Component ${componentName} exists in ${CORE_COMPONENTS_PATH}`);
-  } else {
-    log(
-      chalk.red(
+    if (coreComponentExist) {
+      log(`Component ${componentName} exists in ${CORE_COMPONENTS_PATH}`);
+    } else {
+      log(
+        chalk.red(
+          `Component ${componentName} does not exist in ${CORE_COMPONENTS_PATH}`
+        )
+      );
+      throw new Error(
         `Component ${componentName} does not exist in ${CORE_COMPONENTS_PATH}`
-      )
-    );
-    throw new Error(
-      `Component ${componentName} does not exist in ${CORE_COMPONENTS_PATH}`
-    );
-  }
-
-  // Path
-  const componentPath = {
-    commonDir: CORE_COMPONENTS_PATH,
-    appDir: APP_CORE_COMPONENTS_PATH,
-  };
-  // SRC path
-  let srcComponentPath = path.join(componentPath.commonDir, `${componentName}`);
-  // DEST path
-  let destComponentPath = path.join(componentPath.appDir, `${componentName}`);
-
-  // check if component requires other components
-  const otherComponents = chkMentionComp(
-    path.join(srcComponentPath, `${capitalizeFirstChar(componentName)}.tsx`),
-    componentName
-  );
-  if (otherComponents.length > 0) {
-    otherComponents.forEach((otherComponent) => {
-      cfgComp({
-        component: { componentName: otherComponent },
-        config,
-        theme,
-      });
-    });
-  }
-
-  // Setting the process name again after the recursive call
-  process.title = cfgComp.name;
-
-  // if the component has altered structure/options in the theme
-  if (config.theme && theme) {
-    const themedComponent = theme.components.find(
-      (themedComp) => themedComp.componentName === componentName
-    );
-    if (themedComponent) {
-      // if the component structure has been altered in the theme, copy the entire component's folder
-      if (themedComponent.modifiedComponentDir) {
-        log(
-          `Component ${componentName} has been altered in theme "${config.theme}"`
-        );
-        srcComponentPath = path.resolve(
-          THEMES_PATH,
-          `${config.theme}`,
-          `${themedComponent.modifiedComponentDir}`
-        );
-        fse.copySync(srcComponentPath, destComponentPath);
-        log(`Replaced ${componentName} with the themed version`);
-        return;
-      } else {
-        // altered options
-      }
+      );
     }
-  }
 
-  // If the component has not been altered in the theme, copy the core component.
-  log(`copying core "${componentName}" component to ${componentPath.appDir}`);
-  fse.copySync(srcComponentPath, destComponentPath);
+    // set components core path
+    modifiedComponent.path = path.join(
+      `@/app/core_components/`,
+      componentName,
+      `${capitalizeFirstChar(componentName)}`
+    );
 
-  // Check if the component requires the creation of a dedicated page (e.g., blog post page)
-  const componentYAMLPath = path.join(srcComponentPath, "component.yaml");
-  log(`Checking for component.yaml file at ${componentYAMLPath}...`);
-  if (fse.existsSync(componentYAMLPath)) {
-    log(chalk.green(`Found component.yaml file at ${componentYAMLPath}`));
-    const componentYAML = parseYAML(componentYAMLPath);
+    // Path
+    const componentPath = {
+      commonDir: CORE_COMPONENTS_PATH,
+      appDir: APP_CORE_COMPONENTS_PATH,
+    };
+    // SRC path
+    let srcComponentPath = path.join(
+      componentPath.commonDir,
+      `${componentName}`
+    );
+    // DEST path
+    let destComponentPath = path.join(componentPath.appDir, `${componentName}`);
+
+    // check if component requires other components
+    const otherComponents = chkMentionComp(
+      path.join(srcComponentPath, `${capitalizeFirstChar(componentName)}.tsx`),
+      componentName
+    );
+    if (otherComponents.length > 0) {
+      otherComponents.forEach((otherComponent) => {
+        cfgComp({
+          component: { componentName: otherComponent },
+          config,
+          theme,
+        });
+      });
+    }
+
     // Setting the process name again after the recursive call
     process.title = cfgComp.name;
-    log(`"${componentName}"'s component.yaml successfully parsed`);
-    if (componentYAML.pages) {
-      log(`"${componentName}" requires the creation of dedicated pages`);
-      // Each page is an object of the form { src: string, dest: string }.
-      // Dir must be simply copied from src to dest.
-      componentYAML.pages.forEach((page) => {
-        const src = path.join(srcComponentPath, page.src);
-        const dest = path.join(APP_PATH, page.dest);
-        fse.copySync(src, dest);
-        log(`Dedicated page ${page.src} copied to ${page.dest}`);
-        log("Checking for mentioned components in the dedicated page...");
-        if (!src.endsWith(".tsx")) {
-          const tsxFiles = fs
-            .readdirSync(src)
-            .filter((file) => file.endsWith(".tsx"));
-          log(`Found ${tsxFiles.length} .tsx file(s) in ${src}`);
-          const tsxFilePaths = tsxFiles.map((file) => path.join(src, file));
-          tsxFilePaths.forEach((filePath) => {
-            const otherComponents = chkMentionComp(filePath, componentName);
-            // Setting the process name again after the recursive call
-            process.title = cfgComp.name;
+
+    // if the component has altered structure/options in the theme
+    if (config.theme && theme) {
+      const themedComponent = theme.components.find(
+        (themedComp) => themedComp.componentName === componentName
+      );
+      if (themedComponent) {
+        if (themedComponent.options) {
+          // update the options to the themed component's options
+          modifiedComponent.options = themedComponent.options;
+        }
+        // if the component structure has been altered in the theme, copy the entire component's folder
+        if (themedComponent.modifiedComponentDir) {
+          log(
+            `Component ${componentName} has been altered in theme "${config.theme}"`
+          );
+          srcComponentPath = path.resolve(
+            THEMES_PATH,
+            `${config.theme}`,
+            `${themedComponent.modifiedComponentDir}`
+          );
+          fse.copySync(srcComponentPath, destComponentPath);
+          log(`Copied ${componentName}'s themed version`);
+          // update the path to the modified component
+          modifiedComponent.path = path.join(
+            `@app/theme/`,
+            themedComponent.modifiedComponentDir,
+            `${capitalizeFirstChar(componentName)}`
+          );
+          // return the modified component
+          return modifiedComponent;
+        }
+      }
+    }
+
+    // If the component has not been altered in the theme, copy the core component.
+    log(`copying core "${componentName}" component to ${componentPath.appDir}`);
+    fse.copySync(srcComponentPath, destComponentPath);
+
+    // Check if the component requires the creation of a dedicated page (e.g., blog post page)
+    const componentYAMLPath = path.join(srcComponentPath, "component.yaml");
+    log(`Checking for component.yaml file at ${componentYAMLPath}...`);
+    if (fse.existsSync(componentYAMLPath)) {
+      log(chalk.green(`Found component.yaml file at ${componentYAMLPath}`));
+      const componentYAML = parseYAML(componentYAMLPath);
+      // Setting the process name again after the recursive call
+      process.title = cfgComp.name;
+      log(`"${componentName}"'s component.yaml successfully parsed`);
+      if (componentYAML.pages) {
+        log(`"${componentName}" requires the creation of dedicated pages`);
+        // Each page is an object of the form { src: string, dest: string }.
+        // Dir must be simply copied from src to dest.
+        componentYAML.pages.forEach((page) => {
+          const src = path.join(srcComponentPath, page.src);
+          const dest = path.join(APP_PATH, page.dest);
+          fse.copySync(src, dest);
+          log(`Dedicated page ${page.src} copied to ${page.dest}`);
+          log("Checking for mentioned components in the dedicated page...");
+          if (!src.endsWith(".tsx")) {
+            const tsxFiles = fs
+              .readdirSync(src)
+              .filter((file) => file.endsWith(".tsx"));
+            log(`Found ${tsxFiles.length} .tsx file(s) in ${src}`);
+            const tsxFilePaths = tsxFiles.map((file) => path.join(src, file));
+            tsxFilePaths.forEach((filePath) => {
+              const otherComponents = chkMentionComp(filePath, componentName);
+              // Setting the process name again after the recursive call
+              process.title = cfgComp.name;
+              if (otherComponents.length > 0) {
+                otherComponents.forEach((otherComponent) => {
+                  cfgComp({
+                    component: { componentName: otherComponent },
+                    config,
+                    theme,
+                  });
+                });
+              }
+            });
+          } else {
+            const otherComponents = chkMentionComp(src, componentName);
             if (otherComponents.length > 0) {
               otherComponents.forEach((otherComponent) => {
                 cfgComp({
@@ -241,99 +275,107 @@ function cfgComp({ component, config, theme }) {
                 });
               });
             }
-          });
-        } else {
-          const otherComponents = chkMentionComp(src, componentName);
-          if (otherComponents.length > 0) {
-            otherComponents.forEach((otherComponent) => {
-              cfgComp({
-                component: { componentName: otherComponent },
-                config,
-                theme,
-              });
-            });
           }
-        }
-        // [dest] Alter absolute paths in the dedicated page(s) from @/common/components to @/app/components.
-        log("Altering absolute paths in the dedicated pages(s)");
-        if (!dest.endsWith(".tsx")) {
-          const tsxFiles = fs
-            .readdirSync(dest)
-            .filter((file) => file.endsWith(".tsx"));
-          const tsxFilePaths = tsxFiles.map((file) => path.join(dest, file));
-          tsxFilePaths.forEach((filePath, index) => {
-            log(`Altering absolute paths in ${filePath}`);
-            const filePathDest = filePath;
-            const filePathSrc = path.join(src, tsxFiles[index]);
-            alterImports(filePathSrc, filePath);
-          });
-        } else {
-          log(`Altering absolute paths in ${dest}`);
-          alterImports(src, dest);
-        }
-      });
+          // [dest] Alter absolute paths in the dedicated page(s) from @/common/components to @/app/components.
+          log("Altering absolute paths in the dedicated pages(s)");
+          if (!dest.endsWith(".tsx")) {
+            const tsxFiles = fs
+              .readdirSync(dest)
+              .filter((file) => file.endsWith(".tsx"));
+            const tsxFilePaths = tsxFiles.map((file) => path.join(dest, file));
+            tsxFilePaths.forEach((filePath, index) => {
+              log(`Altering absolute paths in ${filePath}`);
+              const filePathDest = filePath;
+              const filePathSrc = path.join(src, tsxFiles[index]);
+              alterImports(filePathSrc, filePath);
+            });
+          } else {
+            log(`Altering absolute paths in ${dest}`);
+            alterImports(src, dest);
+          }
+        });
+      }
     }
-  }
 
-  // check if there is modifed CSS module, if so, copy it to the component folder
-  // !! must be placed after the copy of the component folder
-  if (config.theme && theme) {
-    const themedComponent = theme.components.find(
-      (themedComp) => themedComp.componentName === componentName
-    );
-    if (themedComponent) {
-      if (themedComponent.modifiedStyles) {
-        // core CSS Module name
-        const cssModulePath = path.join(
-          `${CORE_COMPONENTS_PATH}`,
-          `${componentName}`,
-          `${capitalizeFirstChar(componentName)}.tsx`
-        );
-        const coreCSSModuleName = extractCSSModuleName(cssModulePath);
-        if (!coreCSSModuleName) {
-          log(
-            chalk.red(
-              `Component ${componentName} does not have an initial CSS Module, therefore custom styles from cannot be applied. Please remove the "modifiedStyles" property from the theme's info.yaml file.`
-            )
+    // check if there is modifed CSS module, if so, copy it to the component folder
+    // !! must be placed after the copy of the component folder
+    if (config.theme && theme) {
+      const themedComponent = theme.components.find(
+        (themedComp) => themedComp.componentName === componentName
+      );
+      if (themedComponent) {
+        if (themedComponent.modifiedStyles) {
+          // core CSS Module name
+          const componentPath = path.join(
+            `${CORE_COMPONENTS_PATH}`,
+            `${componentName}`,
+            `${capitalizeFirstChar(componentName)}.tsx`
           );
-        } else {
-          // replace the core CSS Module with the themed CSS Module with the same file name.
-          fse.copyFileSync(
-            path.resolve(
-              `${THEMES_PATH}`,
-              `${config.theme}`,
-              `${themedComponent.modifiedStyles}`
-            ),
-            path.resolve(`${destComponentPath}`, `${coreCSSModuleName}`)
-          );
-          log(
-            chalk.green(
-              `Replaced ${componentName}'s ${coreCSSModuleName} with custom styles module`
-            )
-          );
+          const cssModulePath = extractCSSModulePath(componentPath);
+          if (!cssModulePath) {
+            log(
+              chalk.red(
+                `Component ${componentName} does not have an initial CSS Module, therefore custom styles from cannot be applied. Please remove the "modifiedStyles" property from the theme's info.yaml file.`
+              )
+            );
+          } else {
+            // replace the core CSS Module with the themed CSS Module with the same file name.
+            fse.copyFileSync(
+              path.resolve(
+                `${THEMES_PATH}`,
+                `${config.theme}`,
+                `${themedComponent.modifiedStyles}`
+              ),
+              path.resolve(`${destComponentPath}`, `${cssModulePath}`)
+            );
+            log(
+              chalk.green(
+                `Replaced ${componentName}'s CSS Module with theme's CSS module`
+              )
+            );
+          }
         }
       }
     }
+  } catch (error) {
+    log(`Error configuring component ${component.componentName}`);
+    console.error(error);
+    process.exit(1);
+  } finally {
+    return modifiedComponent;
   }
 }
 
 function copyRequiredComponents(config, theme) {
+  let modifiedConfig = { ...config };
+  if (!config.pages) {
+    console.error("No pages found in the config file!");
+    process.exit(1);
+  }
+
   // page's components
-  config.pages &&
-    config.pages.forEach((page) => {
-      page.components.forEach((component) => {
-        cfgComp({
+  modifiedConfig.pages = config.pages.map((page) => {
+    return {
+      ...page,
+      components: page.components.map((component) => {
+        return cfgComp({
           component,
-          config,
+          config: modifiedConfig,
           theme,
         });
-      });
-    });
+      }),
+    };
+  });
+
   // root components
-  config.rootComponents &&
-    config.rootComponents.forEach((component) => {
-      cfgComp({ component, config, theme });
+  if (config.rootComponents) {
+    modifiedConfig.rootComponents = config.rootComponents.map((component) => {
+      return cfgComp({ component, config: modifiedConfig, theme });
     });
+  }
+
+  // return modified config
+  return modifiedConfig;
 }
 
 function findTheme(themeName, THEME_PATH, themeInfoFilePath) {
@@ -358,6 +400,7 @@ function getTheme(themeName) {
 }
 
 export function initApp(config) {
+  let modifiedConfig = config;
   let theme = null;
   // Setting the process name for better debugging.
   process.title = initApp.name;
@@ -370,13 +413,12 @@ export function initApp(config) {
     theme = getTheme(config.theme);
   }
   // copy all the necessary components to the app folder
-  copyRequiredComponents(config, theme);
-
+  modifiedConfig = copyRequiredComponents(modifiedConfig, theme);
   // copy all the necessary styles to the app folder
   fse.copySync(STYLES_PATH, APP_STYLES_PATH);
   // copy all the necessary types to the app folder
   fse.copySync(TYPES_PATH, APP_TYPES_PATH);
   // copy utils to the app folder
   fse.copySync(UTILS_PATH, APP_UTILS_PATH);
-  return theme;
+  return [modifiedConfig, theme];
 }

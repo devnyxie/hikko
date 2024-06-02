@@ -6,6 +6,8 @@ export default async function sitemap() {
   if (!baseUrl) {
     console.log("baseUrl is not provided. Sitemap can not be generated.");
     return;
+  } else {
+    console.log("Generating sitemap...");
   }
   let blogs = getBlogPosts().map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,

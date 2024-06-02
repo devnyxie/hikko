@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import fs from "fs";
 import { parse } from "yaml";
-import path from "path";
 
 export function log(...args) {
   console.log(chalk.dim(`[${process.title}]:`, ...args));
@@ -9,15 +8,6 @@ export function log(...args) {
 
 export function capitalizeFirstChar(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-export function ensureRelativePath(str) {
-  // Check if the string starts with "./", "../", or "/"
-  if (/^(\.\/|\.\.\/|\/)/.test(str)) {
-    return str;
-  }
-  // If not, prepend "./"
-  return `./${str}`;
 }
 
 export function welcomeMessage() {
@@ -43,6 +33,18 @@ export function extractCSSModuleName(path) {
     log(`Extracting CSS module name from ${path}`);
     const data = fs.readFileSync(path, { encoding: "utf8" });
     const regex = /["'][^"']*\/([^"']*\.module\.css)["']/;
+    const match = data.match(regex);
+    return match[1];
+  } catch (error) {
+    return null;
+  }
+}
+
+export function extractCSSModulePath(path) {
+  try {
+    log(`Extracting CSS module path from ${path}`);
+    const data = fs.readFileSync(path, { encoding: "utf8" });
+    const regex = /"([^"]*\.module\.css)"/;
     const match = data.match(regex);
     return match[1];
   } catch (error) {

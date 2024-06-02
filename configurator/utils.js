@@ -20,28 +20,6 @@ export function ensureRelativePath(str) {
   return `./${str}`;
 }
 
-export function insertContentBetweenStrings(
-  input,
-  startString,
-  endString,
-  content
-) {
-  console.log("[insertContentBetweenStrings]: searching for", startString);
-  const startIndex = input.indexOf(startString);
-  const endIndex = input.indexOf(endString, startIndex + startString.length);
-
-  if (startIndex === -1 || endIndex === -1) {
-    throw new Error("Start or end string not found in input");
-  }
-
-  const before = input.substring(0, endIndex);
-  const after = input.substring(endIndex);
-
-  console.log(`[insertContentBetweenStrings]: added "${content}"`);
-
-  return before + `${content}` + `${after}`;
-}
-
 export function welcomeMessage() {
   const start = `₍ᐢ. .ᐢ₎ ₊˚⊹♡  ✧  `;
   const message = `Welcome to the configurator!`;
@@ -52,8 +30,12 @@ export function welcomeMessage() {
 export function parseYAML(path) {
   process.title = parseYAML.name;
   log(`Parsing a YAML file at ${path}`);
-  const config = fs.readFileSync(path, "utf8");
-  return parse(config);
+  try {
+    const config = fs.readFileSync(path, "utf8");
+    return parse(config);
+  } catch (error) {
+    console.error(chalk.red(`${path} doesn't exist.`));
+  }
 }
 
 export function extractCSSModuleName(path) {

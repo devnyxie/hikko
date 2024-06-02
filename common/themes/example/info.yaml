@@ -3,8 +3,7 @@
 # !!! Without this file the theme will not be loaded !!!
 
 styles: # CSS files that will be loaded in the layout of the page.
-  - ./theme.css 
-# *CSS-in-JS support will be added in the future.
+  - ./theme.css
 components: # Components that were modified or have different options to suit or work with the theme.
   - componentName: blog
     modifiedStyles: ./blog/Blog.module.css # If specified, core styles will be replaced with theme's "./blog/Blog.module.css" file. Works only if the component has a CSS module file already.

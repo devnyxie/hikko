@@ -1,33 +1,23 @@
-// # Themes Implementation
+// purpose of this file is:
+// 1. Check the theme, and if it exists, apply the theme's component options or replace whole component
+// 2. give each component a path to the component file
+// 3. return the modified config object
+// 4. if the theme is not provided, return the config object as is
 
 import chalk from "chalk";
 import { log, capitalizeFirstChar, ensureRelativePath } from "./utils.js";
 import path from "path";
 
-function configureComponent({
-  component,
-  themedComponents,
-  themeName,
-  isRoot,
-}) {
+function configureComponent({ component, themedComponents, themeName }) {
   process.title = configureComponent.name;
   let modifiedComponent = component;
   const coreComponentName = component.componentName;
   // CORE PATHS
-  if (isRoot) {
-    modifiedComponent.path = path.join(
-      `./components/`,
-      coreComponentName,
-      `${capitalizeFirstChar(coreComponentName)}`
-    );
-  } else {
-    modifiedComponent.path = path.join(
-      `../components/`,
-      coreComponentName,
-      `${capitalizeFirstChar(coreComponentName)}`
-    );
-  }
-
+  modifiedComponent.path = path.join(
+    `@/app/core_components/`,
+    coreComponentName,
+    `${capitalizeFirstChar(coreComponentName)}`
+  );
   try {
     if (!themeName) {
       log(chalk.red("Theme path is not provided!"));
@@ -39,19 +29,11 @@ function configureComponent({
     if (themedComponent) {
       // if the component is modified, return the modified component.
       if (themedComponent.modifiedComponentDir) {
-        if (isRoot) {
-          modifiedComponent.path = path.join(
-            `./theme/`,
-            themedComponent.modifiedComponentDir,
-            `${capitalizeFirstChar(coreComponentName)}`
-          );
-        } else {
-          modifiedComponent.path = path.join(
-            `../theme/`,
-            themedComponent.modifiedComponentDir,
-            `${capitalizeFirstChar(coreComponentName)}`
-          );
-        }
+        modifiedComponent.path = path.join(
+          `@app/theme/`,
+          themedComponent.modifiedComponentDir,
+          `${capitalizeFirstChar(coreComponentName)}`
+        );
         log(
           `Altering "${coreComponentName}" component's options to theme's options`
         );
@@ -70,7 +52,6 @@ function configureComponent({
         };
       }
     }
-    modifiedComponent.path = ensureRelativePath(modifiedComponent.path);
     return modifiedComponent;
   } catch (error) {
     console.error(error);
@@ -79,14 +60,12 @@ function configureComponent({
         "Error while choosing component to insert, using core component"
       )
     );
-    // console.error(error);
-    modifiedComponent.path = ensureRelativePath(modifiedComponent.path);
     return modifiedComponent;
   }
 }
 
-export function initTheme(config, theme) {
-  process.title = initTheme.name;
+export function setupComponents(config, theme) {
+  process.title = setupComponents.name;
   const themeName = config.theme;
   let modifiedConfig = config;
   try {

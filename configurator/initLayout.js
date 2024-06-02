@@ -15,16 +15,17 @@ export default function initLayout(config, theme) {
     import { Inter } from "next/font/google";
     import "./styles/globals.css";
     import React from "react";
-    import StoreProvider from "./StoreProvider";
     /*imports [start]*/
     // STYLES
     ${
       theme.styles &&
       (Array.isArray(theme.styles)
         ? theme.styles
-            .map((style) => `\nimport "./${path.join("theme/", `${style}`)}";`)
+            .map(
+              (style) => `\nimport "@/app/${path.join("theme/", `${style}`)}";`
+            )
             .join("\n")
-        : `\nimport "./${path.join("theme/", `${style}`)}";`)
+        : `\nimport "@/app/${path.join("theme/", `${style}`)}";`)
     }
     /*imports [end]*/
     const inter = Inter({ subsets: ["latin"] });
@@ -45,7 +46,6 @@ export default function initLayout(config, theme) {
         // components options [start]
         // components options [end]
         return (
-        <StoreProvider>
           <html lang="en">
             <body className={inter.className}>
               <div>
@@ -59,7 +59,6 @@ export default function initLayout(config, theme) {
               </div>
             </body>
           </html>
-        </StoreProvider>
         );
     }
     
@@ -71,16 +70,17 @@ export default function initLayout(config, theme) {
     import { Inter } from "next/font/google";
     import "./styles/globals.css";
     import React from "react";
-    import StoreProvider from "./StoreProvider";
     /*imports [start]*/
     // STYLES
     ${
       theme.styles &&
       (Array.isArray(theme.styles)
         ? theme.styles
-            .map((style) => `\nimport "./${path.join("theme/", `${style}`)}";`)
+            .map(
+              (style) => `\nimport "@/app/${path.join("theme/", `${style}`)}";`
+            )
             .join("\n")
-        : `\nimport "./${path.join("theme/", `${style}`)}";`)
+        : `\nimport "@/app/${path.join("theme/", `${style}`)}";`)
     }
     // COMPONENTS
     ${
@@ -129,7 +129,6 @@ export default function initLayout(config, theme) {
         }
         // components options [end]
         return (
-        <StoreProvider>
           <html lang="en">
             <body className={inter.className}>
               <div>
@@ -180,7 +179,6 @@ export default function initLayout(config, theme) {
               </div>
             </body>
           </html>
-        </StoreProvider>
         );
     }
     `;

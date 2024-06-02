@@ -1,13 +1,12 @@
-// Please use absolute imports.
 import React from "react";
 import { notFound } from "next/navigation";
 
 // !!! ALL IMPORTS SHOULD BE ABSOLUTE !!!
 // Example of import of another component.
-import { CustomMDX } from "@/common/components/mdx/Mdx";
+import { CustomMDX } from "@/common/core_components/mdx/Mdx";
 // Blog related imports
-import { formatDate, getBlogPosts } from "@/common/components/blog/utils";
-import { baseUrl } from "@/common/components/blog/sitemap";
+import { formatDate, getBlogPosts } from "@/common/core_components/blog/utils";
+import { baseUrl } from "@/common/core_components/blog/sitemap";
 
 export async function generateStaticParams() {
   let posts = getBlogPosts();

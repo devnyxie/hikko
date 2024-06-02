@@ -1,5 +1,5 @@
 import React from "react";
-import module from "./Blog.module.css";
+import module from "./styles/Blog.module.css";
 import { formatDate, getBlogPosts } from "./utils";
 import Link from "next/link";
 

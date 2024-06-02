@@ -1,8 +1,6 @@
-import fse from "fs-extra";
-import { log, parseYAML, welcomeMessage } from "./utils.js";
+import { parseYAML, welcomeMessage } from "./utils.js";
 import initLayout from "./initLayout.js";
 import initPages from "./initPages.js";
-import { initTheme } from "./initTheme.js";
 import { initApp } from "./initApp.js";
 
 export const APP_PATH = "./app";
@@ -13,14 +11,14 @@ function main() {
   let config = null;
   let theme = null;
   // ---
-  // print out welcome message
   welcomeMessage();
-  // parse the config file
   config = parseYAML(CONFIG_PATH);
+  if (!config) {
+    return;
+  }
   // create app folder with all the necessary files
-  theme = initApp(config);
+  [config, theme] = initApp(config);
   // theme implementation
-  config = initTheme(config, theme);
   // create layout with root components (e.g navbar, footer, etc.)
   initLayout(config, theme);
   // create pages with selected components

@@ -70,6 +70,8 @@ export default function initLayout(config, theme) {
     import { Inter } from "next/font/google";
     import "./styles/globals.css";
     import React from "react";
+    import ThemeRegistry from "./joy_ui/ThemeRegistry";
+    import ColorInit from "./joy_ui/ColorInit";
     /*imports [start]*/
     // STYLES
     ${
@@ -131,14 +133,41 @@ export default function initLayout(config, theme) {
         return (
           <html lang="en">
             <body className={inter.className}>
-              <div className="container">
-                <div>
-                  {/*placement: top [start]*/}
-                  ${
-                    config.rootComponents &&
-                    config.rootComponents
+              <ColorInit />
+              <ThemeRegistry options={{ key: "joy" }}>
+                <div className="container">
+                  <div>
+                    {/*placement: top [start]*/}
+                    ${
+                      config.rootComponents &&
+                      config.rootComponents
+                        .map((component) => {
+                          if (component.placement === "top") {
+                            if (!component.placement) {
+                              console.error(
+                                "component does not have a placement"
+                              );
+                            }
+                            const componentName = component.componentName;
+                            const capitalizedComponentName =
+                              capitalizeFirstChar(componentName);
+                            return `\n<${capitalizedComponentName} ${
+                              component.options
+                                ? `options={${componentName}_options}`
+                                : ``
+                            } />`;
+                          }
+                        })
+                        .join("")
+                    }
+                    {/*placement: top [end]*/}
+                  </div>
+                  <main>{children}</main>
+                  <div>
+                    {/* placement: bottom [start] */}
+                    ${config.rootComponents
                       .map((component) => {
-                        if (component.placement === "top") {
+                        if (component.placement === "bottom") {
                           if (!component.placement) {
                             console.error(
                               "component does not have a placement"
@@ -154,33 +183,11 @@ export default function initLayout(config, theme) {
                           } />`;
                         }
                       })
-                      .join("")
-                  }
-                  {/*placement: top [end]*/}
+                      .join("")}
+                    {/* placement: bottom [end] */}
+                  </div>
                 </div>
-                <main>{children}</main>
-                <div>
-                  {/* placement: bottom [start] */}
-                  ${config.rootComponents
-                    .map((component) => {
-                      if (component.placement === "bottom") {
-                        if (!component.placement) {
-                          console.error("component does not have a placement");
-                        }
-                        const componentName = component.componentName;
-                        const capitalizedComponentName =
-                          capitalizeFirstChar(componentName);
-                        return `\n<${capitalizedComponentName} ${
-                          component.options
-                            ? `options={${componentName}_options}`
-                            : ``
-                        } />`;
-                      }
-                    })
-                    .join("")}
-                  {/* placement: bottom [end] */}
-                </div>
-              </div>
+              </ThemeRegistry>
             </body>
           </html>
         );

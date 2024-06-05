@@ -1,3 +1,4 @@
+"use client";
 // Navbar.tsx
 import React from "react";
 import module from "./Navbar.module.css";

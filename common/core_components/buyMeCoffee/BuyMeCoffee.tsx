@@ -3,6 +3,8 @@ import module from "./BuyMeCoffee.module.css";
 import Image from "next/image";
 import coffeeSVG from "./coffee.svg";
 import Link from "next/link";
+import Button from "@mui/joy/Button";
+import { IconButton } from "@mui/joy";
 
 interface NavbarOptions {
   url: string;
@@ -15,11 +17,21 @@ interface NavbarProps {
 const BuyMeCoffeeButton: React.FC<NavbarProps> = ({ options }) => {
   return (
     <div className={module.main}>
-      <Link
+      <IconButton
+        variant="plain"
+        component="a"
         className={module.link}
         target="_blank"
         href={options.url}
         rel="noopener noreferrer"
+        sx={
+          {
+            backgroundColor: "#ff813f",
+            "&:hover": {
+              backgroundColor: "#db692c",
+            },
+          } as any
+        }
       >
         <Image
           width={30}
@@ -28,7 +40,7 @@ const BuyMeCoffeeButton: React.FC<NavbarProps> = ({ options }) => {
           alt="Buy me a coffee!"
           className={module.img}
         />
-      </Link>
+      </IconButton>
     </div>
   );
 };

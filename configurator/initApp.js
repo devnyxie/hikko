@@ -26,6 +26,9 @@ const APP_TYPES_PATH = "./app/types";
 const UTILS_PATH = "./common/utils";
 const APP_UTILS_PATH = "./app/utils";
 
+const JOY_UI_PATH = "./common/joy_ui";
+const APP_JOY_UI_PATH = "./app/joy_ui";
+
 function alterPageAbsolutePaths(filePath) {
   const from = "@/common/components";
   const to = "@/app/components";
@@ -420,5 +423,7 @@ export function initApp(config) {
   fse.copySync(TYPES_PATH, APP_TYPES_PATH);
   // copy utils to the app folder
   fse.copySync(UTILS_PATH, APP_UTILS_PATH);
+  // copy joy_ui to the app folder
+  fse.copySync(JOY_UI_PATH, APP_JOY_UI_PATH);
   return [modifiedConfig, theme];
 }

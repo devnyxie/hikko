@@ -9,7 +9,6 @@ Hikko is a Next.js configurator that generates websites from a single config fil
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 **Table of Contents**
 
 - [Features](#features)
@@ -17,7 +16,7 @@ Hikko is a Next.js configurator that generates websites from a single config fil
   - [Installation](#installation)
     - [Clone the repository](#clone-the-repository)
     - [Navitgate to the project directory](#navitgate-to-the-project-directory)
-  - [Write a config file](#write-a-config-file)
+  - [Write a config file sss](#write-a-config-file-sss)
   - [Test your site (optional)](#test-your-site-optional)
 - [to-do](#to-do)
 - [License](#license)

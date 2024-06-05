@@ -7,8 +7,8 @@ export default function initLayout(config, theme) {
   process.title = initLayout.name;
   log("starting layout initialization");
   let htmlContent = "";
-  if (!config.rootComponents) {
-    log("rootComponents not found in config");
+  if (!config.root_components) {
+    log("root_components not found in config");
     // CLEAN LAYOUT
     htmlContent = `
     import type { Metadata } from "next";
@@ -70,8 +70,8 @@ export default function initLayout(config, theme) {
     import { Inter } from "next/font/google";
     import "./styles/globals.css";
     import React from "react";
-    import ThemeRegistry from "./joy_ui/ThemeRegistry";
-    import ColorInit from "./joy_ui/ColorInit";
+    import ThemeRegistry from "./mui/ThemeRegistry";
+    import ColorInit from "./mui/ColorInit";
     /*imports [start]*/
     // STYLES
     ${
@@ -86,13 +86,13 @@ export default function initLayout(config, theme) {
     }
     // COMPONENTS
     ${
-      config.rootComponents.length > 0 &&
-      config.rootComponents
+      config.root_components.length > 0 &&
+      config.root_components
         .map((component) => {
           if (!component.placement) {
             console.error("component does not have a placement");
           }
-          const componentName = component.componentName;
+          const componentName = component.component_name;
           const capitalizedComponentName = capitalizeFirstChar(componentName);
           return `\nimport ${capitalizedComponentName} from "${component.path}";`;
         })
@@ -117,11 +117,11 @@ export default function initLayout(config, theme) {
     }>) {
         // components options [start]
         ${
-          config.rootComponents &&
-          config.rootComponents
+          config.root_components &&
+          config.root_components
             .map((component) => {
               if (component.options) {
-                const componentName = component.componentName;
+                const componentName = component.component_name;
                 return `\nconst ${componentName}_options = ${JSON.stringify(
                   component.options
                 )};`;
@@ -139,8 +139,8 @@ export default function initLayout(config, theme) {
                   <div>
                     {/*placement: top [start]*/}
                     ${
-                      config.rootComponents &&
-                      config.rootComponents
+                      config.root_components &&
+                      config.root_components
                         .map((component) => {
                           if (component.placement === "top") {
                             if (!component.placement) {
@@ -148,7 +148,7 @@ export default function initLayout(config, theme) {
                                 "component does not have a placement"
                               );
                             }
-                            const componentName = component.componentName;
+                            const componentName = component.component_name;
                             const capitalizedComponentName =
                               capitalizeFirstChar(componentName);
                             return `\n<${capitalizedComponentName} ${
@@ -165,7 +165,7 @@ export default function initLayout(config, theme) {
                   <main>{children}</main>
                   <div>
                     {/* placement: bottom [start] */}
-                    ${config.rootComponents
+                    ${config.root_components
                       .map((component) => {
                         if (component.placement === "bottom") {
                           if (!component.placement) {
@@ -173,7 +173,7 @@ export default function initLayout(config, theme) {
                               "component does not have a placement"
                             );
                           }
-                          const componentName = component.componentName;
+                          const componentName = component.component_name;
                           const capitalizedComponentName =
                             capitalizeFirstChar(componentName);
                           return `\n<${capitalizedComponentName} ${

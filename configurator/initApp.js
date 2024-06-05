@@ -3,7 +3,6 @@ import fs from "fs";
 import { APP_PATH } from "./index.js";
 import {
   capitalizeFirstChar,
-  extractCSSModuleName,
   extractCSSModulePath,
   log,
   parseYAML,
@@ -26,8 +25,8 @@ const APP_TYPES_PATH = "./app/types";
 const UTILS_PATH = "./common/utils";
 const APP_UTILS_PATH = "./app/utils";
 
-const JOY_UI_PATH = "./common/joy_ui";
-const APP_JOY_UI_PATH = "./app/joy_ui";
+const MUI_PATH = "./common/mui";
+const APP_MUI_PATH = "./app/mui";
 
 function alterPageAbsolutePaths(filePath) {
   const from = "@/common/components";
@@ -134,7 +133,7 @@ function cfgComp({ component, config, theme }) {
   process.title = cfgComp.name;
   try {
     // Setting the process name for better debugging.
-    const componentName = component.componentName;
+    const componentName = component.component_name;
 
     const coreComponentPath = path.join(CORE_COMPONENTS_PATH, componentName);
     const coreComponentExist = fse.existsSync(coreComponentPath);
@@ -180,7 +179,7 @@ function cfgComp({ component, config, theme }) {
     if (otherComponents.length > 0) {
       otherComponents.forEach((otherComponent) => {
         cfgComp({
-          component: { componentName: otherComponent },
+          component: { component_name: otherComponent },
           config,
           theme,
         });
@@ -193,7 +192,7 @@ function cfgComp({ component, config, theme }) {
     // if the component has altered structure/options in the theme
     if (config.theme && theme) {
       const themedComponent = theme.components.find(
-        (themedComp) => themedComp.componentName === componentName
+        (themedComp) => themedComp.component_name === componentName
       );
       if (themedComponent) {
         if (themedComponent.options) {
@@ -260,7 +259,7 @@ function cfgComp({ component, config, theme }) {
               if (otherComponents.length > 0) {
                 otherComponents.forEach((otherComponent) => {
                   cfgComp({
-                    component: { componentName: otherComponent },
+                    component: { component_name: otherComponent },
                     config,
                     theme,
                   });
@@ -272,7 +271,7 @@ function cfgComp({ component, config, theme }) {
             if (otherComponents.length > 0) {
               otherComponents.forEach((otherComponent) => {
                 cfgComp({
-                  component: { componentName: otherComponent },
+                  component: { component_name: otherComponent },
                   config,
                   theme,
                 });
@@ -304,10 +303,10 @@ function cfgComp({ component, config, theme }) {
     // !! must be placed after the copy of the component folder
     if (config.theme && theme) {
       const themedComponent = theme.components.find(
-        (themedComp) => themedComp.componentName === componentName
+        (themedComp) => themedComp.component_name === componentName
       );
       if (themedComponent) {
-        if (themedComponent.modifiedStyles) {
+        if (themedComponent.modified_styles) {
           // core CSS Module name
           const componentPath = path.join(
             `${CORE_COMPONENTS_PATH}`,
@@ -318,7 +317,7 @@ function cfgComp({ component, config, theme }) {
           if (!cssModulePath) {
             log(
               chalk.red(
-                `Component ${componentName} does not have an initial CSS Module, therefore custom styles from cannot be applied. Please remove the "modifiedStyles" property from the theme's info.yaml file.`
+                `Component ${componentName} does not have an initial CSS Module, therefore custom styles from cannot be applied. Please remove the "modified_styles" property from the theme's theme.yaml file.`
               )
             );
           } else {
@@ -327,7 +326,7 @@ function cfgComp({ component, config, theme }) {
               path.resolve(
                 `${THEMES_PATH}`,
                 `${config.theme}`,
-                `${themedComponent.modifiedStyles}`
+                `${themedComponent.modified_styles}`
               ),
               path.resolve(`${destComponentPath}`, `${cssModulePath}`)
             );
@@ -341,7 +340,7 @@ function cfgComp({ component, config, theme }) {
       }
     }
   } catch (error) {
-    log(`Error configuring component ${component.componentName}`);
+    log(`Error configuring component ${component.component_name}`);
     console.error(error);
     process.exit(1);
   } finally {
@@ -371,8 +370,8 @@ function copyRequiredComponents(config, theme) {
   });
 
   // root components
-  if (config.rootComponents) {
-    modifiedConfig.rootComponents = config.rootComponents.map((component) => {
+  if (config.root_components) {
+    modifiedConfig.root_components = config.root_components.map((component) => {
       return cfgComp({ component, config: modifiedConfig, theme });
     });
   }
@@ -396,7 +395,7 @@ function findTheme(themeName, THEME_PATH, themeInfoFilePath) {
 
 function getTheme(themeName) {
   const THEME_PATH = path.join(APP_PATH, "./theme");
-  const themeInfoFilePath = `${THEME_PATH}/info.yaml`;
+  const themeInfoFilePath = `${THEME_PATH}/theme.yaml`;
   findTheme(themeName, THEME_PATH, themeInfoFilePath);
   const theme = parseYAML(themeInfoFilePath);
   return theme;
@@ -423,7 +422,7 @@ export function initApp(config) {
   fse.copySync(TYPES_PATH, APP_TYPES_PATH);
   // copy utils to the app folder
   fse.copySync(UTILS_PATH, APP_UTILS_PATH);
-  // copy joy_ui to the app folder
-  fse.copySync(JOY_UI_PATH, APP_JOY_UI_PATH);
+  // copy mui to the app folder
+  fse.copySync(MUI_PATH, APP_MUI_PATH);
   return [modifiedConfig, theme];
 }

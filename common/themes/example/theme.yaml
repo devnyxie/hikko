@@ -4,9 +4,10 @@
 
 styles: # CSS files that will be loaded in the layout of the page.
   - ./theme.css
+mui_theme:
 components: # Components that were modified or have different options to suit or work with the theme.
-  - componentName: blog
-    modifiedStyles: ./blog/Blog.module.css # If specified, core styles will be replaced with theme's "./blog/Blog.module.css" file. Works only if the component has a CSS module file already.
+  - component_name: blog
+    modified_styles: ./blog/Blog.module.css # If specified, core styles will be replaced with theme's "./blog/Blog.module.css" file. Works only if the component has a CSS module file already.
     #modifiedComponentDir: ./blog # If specified, entire core dir will be replaced with theme's "./blog" dir. App will consider file "Blog.tsx" as the main file of the component.
     # options:
     #   title: My Blog <3

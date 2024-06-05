@@ -26,7 +26,7 @@ export default function initPages(pages) {
     // imports start
     ${page.components
       .map((component) => {
-        const componentName = component.componentName;
+        const componentName = component.component_name;
         return `\nimport ${capitalizeFirstChar(componentName)} from "${
           component.path
         }";`;
@@ -38,7 +38,7 @@ export default function initPages(pages) {
       ${page.components
         .map((component) => {
           if (component.options) {
-            const componentName = component.componentName;
+            const componentName = component.component_name;
             return `\nconst ${componentName}_options = ${JSON.stringify(
               component.options
             )};`;
@@ -51,7 +51,7 @@ export default function initPages(pages) {
                 {/* components start */}
                 ${page.components
                   .map((component) => {
-                    const componentName = component.componentName;
+                    const componentName = component.component_name;
                     return `\n<${capitalizeFirstChar(componentName)} ${
                       component.options
                         ? `options={${componentName}_options}`

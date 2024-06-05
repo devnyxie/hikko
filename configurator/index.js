@@ -18,7 +18,6 @@ function main() {
   }
   // create app folder with all the necessary files
   [config, theme] = initApp(config);
-  // theme implementation
   // create layout with root components (e.g navbar, footer, etc.)
   initLayout(config, theme);
   // create pages with selected components

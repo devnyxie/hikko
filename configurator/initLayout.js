@@ -75,15 +75,17 @@ export default function initLayout(config, theme) {
     /*imports [start]*/
     // STYLES
     ${
-      theme.styles &&
-      (Array.isArray(theme.styles)
-        ? theme.styles
-            .map(
-              (style) => `\nimport "@/app/${path.join("theme/", `${style}`)}";`
-            )
-            .join("\n")
-        : `\nimport "@/app/${path.join("theme/", `${style}`)}";`)
-    }
+      theme && theme.styles
+        ? Array.isArray(theme.styles)
+          ? theme.styles
+              .map(
+                (style) =>
+                  `\nimport "@/app/${path.join("theme/", `${style}`)}";`
+              )
+              .join("\n")
+          : `\nimport "@/app/${path.join("theme/", `${theme.styles}`)}";`
+        : ""
+    }    
     // COMPONENTS
     ${
       config.root_components.length > 0 &&
@@ -193,7 +195,7 @@ export default function initLayout(config, theme) {
         );
     }
     `;
+    fs.writeFileSync(`./app/layout.tsx`, htmlContent);
+    log("finished layout initialization");
   }
-  fs.writeFileSync(`./app/layout.tsx`, htmlContent);
-  log("finished layout initialization");
 }

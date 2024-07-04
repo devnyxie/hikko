@@ -4,6 +4,7 @@ import React from "react";
 import module from "./Navbar.module.css";
 import ThemeToggler from "../themeToggler/ThemeToggler";
 import BuyMeCoffeeButton from "../buyMeCoffee/BuyMeCoffee";
+import Link from "next/link";
 
 interface Link {
   title: string | null;
@@ -23,18 +24,25 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ options }) => {
+  // site title
+  const SiteTitleComponent = options.siteTitle ? (
+    <div>{options.siteTitle}</div>
+  ) : (
+    <></>
+  );
+
   return (
     <div className={module.navbar}>
-      <div>{options.siteTitle}</div>
+      {SiteTitleComponent}
       <div className={module.menu}>
         <div>
           {/* If links are present, render them: */}
           {options.links &&
             options.links.length > 0 &&
             options.links.map((link, index) => (
-              <a key={index} href={link.url}>
+              <Link key={index} href={link.url} className={module.link}>
                 {link.title}
-              </a>
+              </Link>
             ))}
         </div>
         {/* If buyMeCoffee option is true and username is present, render it: */}

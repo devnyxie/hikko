@@ -1,12 +1,12 @@
 import React from "react";
 import { notFound } from "next/navigation";
-
 // !!! ALL IMPORTS SHOULD BE ABSOLUTE !!!
 // Example of import of another component.
 import { CustomMDX } from "@/common/core_components/mdx/Mdx";
 // Blog related imports
 import { formatDate, getBlogPosts } from "@/common/core_components/blog/utils";
 import { baseUrl } from "@/common/core_components/blog/sitemap";
+import module from "./page.module.css";
 
 export async function generateStaticParams() {
   let posts = getBlogPosts();
@@ -87,13 +87,9 @@ export default function Blog({ params }: any) {
           }),
         }}
       />
-      <h1 className="title font-semibold text-2xl tracking-tighter">
-        {post.metadata.title}
-      </h1>
-      <div className="flex justify-between items-center mt-2 mb-8 text-sm">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {formatDate(post.metadata.publishedAt)}
-        </p>
+      <div className={module.topSection}>
+        <h1 className={module.heading}>{post.metadata.title}</h1>
+        <p className={module.date}>{formatDate(post.metadata.publishedAt)}</p>
       </div>
       <article className="prose">
         <CustomMDX source={post.content} />

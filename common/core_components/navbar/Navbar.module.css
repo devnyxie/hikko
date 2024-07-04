@@ -2,9 +2,14 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  margin-bottom: 3rem;
 }
 
 .menu {
   display: flex;
   gap: 0.5rem;
+}
+
+.link {
+  margin-right: 1rem;
 }

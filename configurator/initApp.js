@@ -191,34 +191,36 @@ function cfgComp({ component, config, theme }) {
 
     // if the component has altered structure/options in the theme
     if (config.theme && theme) {
-      const themedComponent = theme.components.find(
-        (themedComp) => themedComp.component_name === componentName
-      );
-      if (themedComponent) {
-        if (themedComponent.options) {
-          // update the options to the themed component's options
-          modifiedComponent.options = themedComponent.options;
-        }
-        // if the component structure has been altered in the theme, copy the entire component's folder
-        if (themedComponent.modifiedComponentDir) {
-          log(
-            `Component ${componentName} has been altered in theme "${config.theme}"`
-          );
-          srcComponentPath = path.resolve(
-            THEMES_PATH,
-            `${config.theme}`,
-            `${themedComponent.modifiedComponentDir}`
-          );
-          fse.copySync(srcComponentPath, destComponentPath);
-          log(`Copied ${componentName}'s themed version`);
-          // update the path to the modified component
-          modifiedComponent.path = path.join(
-            `@app/theme/`,
-            themedComponent.modifiedComponentDir,
-            `${capitalizeFirstChar(componentName)}`
-          );
-          // return the modified component
-          return modifiedComponent;
+      if (theme.components && theme.components.length > 0) {
+        const themedComponent = theme.components.find(
+          (themedComp) => themedComp.component_name === componentName
+        );
+        if (themedComponent) {
+          if (themedComponent.options) {
+            // update the options to the themed component's options
+            modifiedComponent.options = themedComponent.options;
+          }
+          // if the component structure has been altered in the theme, copy the entire component's folder
+          if (themedComponent.modifiedComponentDir) {
+            log(
+              `Component ${componentName} has been altered in theme "${config.theme}"`
+            );
+            srcComponentPath = path.resolve(
+              THEMES_PATH,
+              `${config.theme}`,
+              `${themedComponent.modifiedComponentDir}`
+            );
+            fse.copySync(srcComponentPath, destComponentPath);
+            log(`Copied ${componentName}'s themed version`);
+            // update the path to the modified component
+            modifiedComponent.path = path.join(
+              `@app/theme/`,
+              themedComponent.modifiedComponentDir,
+              `${capitalizeFirstChar(componentName)}`
+            );
+            // return the modified component
+            return modifiedComponent;
+          }
         }
       }
     }
@@ -301,7 +303,12 @@ function cfgComp({ component, config, theme }) {
 
     // check if there is modifed CSS module, if so, copy it to the component folder
     // !! must be placed after the copy of the component folder
-    if (config.theme && theme) {
+    if (
+      config.theme &&
+      theme &&
+      theme.components &&
+      theme.components.length > 0
+    ) {
       const themedComponent = theme.components.find(
         (themedComp) => themedComp.component_name === componentName
       );

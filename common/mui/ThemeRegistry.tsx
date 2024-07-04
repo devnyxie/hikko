@@ -4,8 +4,9 @@ import React from "react";
 import createCache from "@emotion/cache";
 import { useServerInsertedHTML } from "next/navigation";
 import { CacheProvider } from "@emotion/react";
-import { CssVarsProvider, extendTheme } from "@mui/joy/styles";
+import { CssVarsProvider, extendTheme, useColorScheme } from "@mui/joy/styles";
 import CssBaseline from "@mui/joy/CssBaseline";
+import ColorInit from "./ColorInit";
 
 // Custom Theme here (optional)
 const theme = extendTheme({});
@@ -15,6 +16,9 @@ export default function ThemeRegistry(props: {
   children: React.ReactNode;
 }) {
   const { options, children } = props;
+  function initCS() {
+    return <>{useColorScheme()}</>;
+  }
 
   const [{ cache, flush }] = React.useState(() => {
     const cache = createCache(options);
@@ -58,12 +62,14 @@ export default function ThemeRegistry(props: {
 
   return (
     <>
-      <CacheProvider value={cache}>
-        <CssVarsProvider theme={theme}>
-          <CssBaseline />
-          {children}
-        </CssVarsProvider>
-      </CacheProvider>
+      {/* <CacheProvider value={cache}> */}
+      <CssVarsProvider theme={theme}>
+        <ColorInit />
+        <CssBaseline />
+        {/* {initCS()} */}
+        {children}
+      </CssVarsProvider>
+      {/* </CacheProvider> */}
     </>
   );
 }
